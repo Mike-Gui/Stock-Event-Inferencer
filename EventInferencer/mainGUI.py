@@ -12,11 +12,16 @@ import csv
 import pandas as pd
 #import matplotlib.pyplot as plt; plt.rcdefaults()
 import numpy as np
+from matplotlib import *
 import matplotlib.pyplot as plt
 import requests
 from bs4 import BeautifulSoup
 import datetime as datetime
 import time
+from time import sleep
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
+from matplotlib.backend_bases import key_press_handler
+from matplotlib.figure import Figure
 
 
 ###API Configs-----------------------------------------------------------------------------
@@ -38,9 +43,11 @@ class Menu:
         self.entry = Entry(self.ef, textvariable = self.t, bg='white') 
         self.bt = Button(self.ef, text = 'Find', command = self.tickerAsk)
         self.entry.pack(side = LEFT, padx = 5)
-        self.bt.pack(side = LEFT, padx= 5)
+        self.bt.pack(side = LEFT, padx = 5)
         self.bt2 = Button(self.ef, text = 'Clear', command = self.clearButton)
-        self.bt2.pack(side = LEFT, padx= 5)
+        self.bt2.pack(side = LEFT, padx = 5)
+        self.bt3 = Button(self.ef, text = 'Chart', command= self.plot)
+        self.bt3.pack(side = LEFT , padx = 5)
         self.ef.pack(expand=0, fill=X, pady=5, side = BOTTOM)
         self.x = Label(self.ef, text = "") ##Intraday Change value from tickerAsk.py
         self.x.pack(side= RIGHT, padx = 10)
@@ -55,13 +62,15 @@ class Menu:
         self.w3 = Label(self.ef, text = 'Company Name:')
         self.w3.pack(side= RIGHT, padx = 10)
         
-
-        #----Chart Display----------------------------------------------
+        #----Chart Title Display----------------------------------------------
         self.chart = Frame(frame, bd=5, relief='groove')
-        self.chartlabel  = Label(self.chart, text = "1 Year Price action", font=('bold'))
+        self.chartlabel  = Label(self.chart, text = "1 Year Chart", font=('bold'))
         self.chartlabel.pack(side = BOTTOM)
         self.chart.pack(side=BOTTOM, pady = 5, padx=2.5, expand=0)
+        #----Chart Display----------------------------------------------
+        self.chart = Button()
         
+
         #----Status log----------------------------------------------
         self.lf = Frame(frame, bd=2, relief='groove')
         self.lb = Label(self.lf, text='Status:')
@@ -91,6 +100,12 @@ class Menu:
         self.x.configure(text = "")
         self.x2.configure(text = "")
         self.x3.configure(text = "")
+    def plot():
+        try:
+            plotter()
+        except Exception as e:
+            print ("Oh Dear!")
+        
 ###Realtime price data from Yahoo Finance--------------------------------------------------------------------------------------------        
 
 def tickerGetFirst(ticker):
@@ -119,15 +134,31 @@ def tickerGetFirst(ticker):
 def historicalData(ticker):
     period1 = int(time.mktime((datetime.datetime.now() - datetime.timedelta(days = 365)).timetuple()))
     period2 = int(time.mktime(datetime.datetime.now().timetuple()))
-    interval = "1d"
+    interval = "1d" #1w or 1m
     ticker = ticker.get()
-
+    tickerstring = str(ticker)
     yahooQuery = f'https://query1.finance.yahoo.com/v7/finance/download/{ticker}?period1={period1}&period2={period2}&interval={interval}&events=history&includeAdjustedClose=true'
 
     print(yahooQuery)
-    #df = pd.read_csv(yahooQuery)
-    #print(df)
-    #df.to_csv()
+    df = pd.read_csv(yahooQuery)
+    df.drop('Open', axis=1, inplace=True)
+    df.drop('High', axis=1, inplace=True)
+    df.drop('Low', axis=1, inplace=True)
+    df.drop('Adj Close', axis=1, inplace=True)
+    df.drop('Volume', axis=1, inplace=True)
+    print(df)
+
+
+
+####ChartAssembly---------------------------------------------------------------------------------------------------------------------------------------------
+    #plt.figure(figsize=(10,10))
+    rc('lines', linewidth=0.9, color='r')
+    df.plot(x= 'Date', y = 'Close', kind = 'line', color = "black")
+
+    plt.show()
+
+
+
 
 
 
