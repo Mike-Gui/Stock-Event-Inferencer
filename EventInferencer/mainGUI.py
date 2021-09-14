@@ -73,13 +73,14 @@ class Menu:
         #-------------------------------------------------------------
     def tickerAsk(self): ##when the user presses "Find" after entering a stock ticker, this function is called, sending the user's input to a webscraper function in utilities.py
           self.listbox.insert(END,'"'+ self.t.get()+'"' + ' Selected')
-          currentTicker = self.t.get()
+          
           try:
               tickerGetFirst(self.t)
+              historicalData(self.t)
               self.x.configure(text = intradayChange) #sets the intraday change label to what is returned by the data from yahoo finance.
               self.x2.configure(text = "$"+ price) #sets the price label to what is returned by the data from yahoo finance.
               self.x3.configure(text = companyName)
-               
+              
           except Exception as e: #if nothing is returned, the exception returns an error message
                print(e)
                self.listbox.insert(END, 'Error finding all ' + self.t.get()+ " data")
@@ -87,7 +88,9 @@ class Menu:
     def clearButton(self): ##update to remove all dynamic variables at the end
         self.listbox.delete(0, END) ## clears the listbox
         self.listbox.insert(END, 'Search Cleared')
-        currentTicker = ""
+        self.x.configure(text = "")
+        self.x2.configure(text = "")
+        self.x3.configure(text = "")
 ###Realtime price data from Yahoo Finance--------------------------------------------------------------------------------------------        
 
 def tickerGetFirst(ticker):
@@ -113,19 +116,18 @@ def tickerGetFirst(ticker):
         intradayChange = yahoosoup.find('span', {'class': 'Trsdu(0.3s) Fw(500) Pstart(10px) Fz(24px) C($positiveColor)'}).text  
           
 ####Historical Data Retriever---------------------------------------------------------------------------------------------------------------------------------
-#def historicalData()
-
-    
-    period1 = int(time.mktime(datetime.datetime.now().timetuple()))
-    
-    period2 = int(time.mktime(datetime.datetime.(datetime.datetime.now() - datetime.timedelta(days = 365)).timetuple()))
-    
-    print(period1)
-    interval = ("1d")
+def historicalData(ticker):
+    period1 = int(time.mktime((datetime.datetime.now() - datetime.timedelta(days = 365)).timetuple()))
+    period2 = int(time.mktime(datetime.datetime.now().timetuple()))
+    interval = "1d"
+    ticker = ticker.get()
 
     yahooQuery = f'https://query1.finance.yahoo.com/v7/finance/download/{ticker}?period1={period1}&period2={period2}&interval={interval}&events=history&includeAdjustedClose=true'
 
-
+    print(yahooQuery)
+    #df = pd.read_csv(yahooQuery)
+    #print(df)
+    #df.to_csv()
 
 
 
