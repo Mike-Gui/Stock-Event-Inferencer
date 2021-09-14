@@ -114,11 +114,16 @@ def tickerGetFirst(ticker):
           
 ####Historical Data Retriever---------------------------------------------------------------------------------------------------------------------------------
 #def historicalData()
-period1 =int(time.mktime(datetime.datetime().timetuple()))
-period2 = 
-interval = {"1d"}
 
-yahooQuery = f'https://query1.finance.yahoo.com/v7/finance/download/{ticker}?period1={period1}&period2={period2}&interval={interval}&events=history&includeAdjustedClose=true'
+    
+    period1 = int(time.mktime(datetime.datetime.now().timetuple()))
+    
+    period2 = int(time.mktime(datetime.datetime.(datetime.datetime.now() - datetime.timedelta(days = 365)).timetuple()))
+    
+    print(period1)
+    interval = ("1d")
+
+    yahooQuery = f'https://query1.finance.yahoo.com/v7/finance/download/{ticker}?period1={period1}&period2={period2}&interval={interval}&events=history&includeAdjustedClose=true'
 
 
 
