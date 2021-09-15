@@ -19,9 +19,10 @@ from bs4 import BeautifulSoup
 import datetime as datetime
 import time
 from time import sleep
-from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
-from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
+
+
 
 
 ###API Configs-----------------------------------------------------------------------------
@@ -46,8 +47,6 @@ class Menu:
         self.bt.pack(side = LEFT, padx = 5)
         self.bt2 = Button(self.ef, text = 'Clear', command = self.clearButton)
         self.bt2.pack(side = LEFT, padx = 5)
-        self.bt3 = Button(self.ef, text = 'Chart', command= self.plot)
-        self.bt3.pack(side = LEFT , padx = 5)
         self.ef.pack(expand=0, fill=X, pady=5, side = BOTTOM)
         self.x = Label(self.ef, text = "") ##Intraday Change value from tickerAsk.py
         self.x.pack(side= RIGHT, padx = 10)
@@ -100,11 +99,7 @@ class Menu:
         self.x.configure(text = "")
         self.x2.configure(text = "")
         self.x3.configure(text = "")
-    def plot():
-        try:
-            plotter()
-        except Exception as e:
-            print ("Oh Dear!")
+
         
 ###Realtime price data from Yahoo Finance--------------------------------------------------------------------------------------------        
 
@@ -146,16 +141,16 @@ def historicalData(ticker):
     df.drop('Low', axis=1, inplace=True)
     df.drop('Adj Close', axis=1, inplace=True)
     df.drop('Volume', axis=1, inplace=True)
-    print(df)
-
-
+    #print(df)
 
 ####ChartAssembly---------------------------------------------------------------------------------------------------------------------------------------------
-    #plt.figure(figsize=(10,10))
-    rc('lines', linewidth=0.9, color='r')
-    df.plot(x= 'Date', y = 'Close', kind = 'line', color = "black")
-
+    #df.plot()    #x= 'Date', y = 'Close', kind = 'line', color = "black")
+    plt.figure(figsize=(12,5))
+    plt.plot(df.index, df['Close'], color = "black", linewidth=0.9)
+    plt.xlabel("date")
+    plt.ylabel("$ price")
     plt.show()
+
 
 
 
