@@ -60,7 +60,15 @@ class Menu:
         self.chartlabel.pack(side = BOTTOM)
         self.chart.pack(side=BOTTOM, pady = 5, padx=2.5, expand=0)
         #----Chart Display----------------------------------------------
-
+        self.chart = Frame(frame, bd=2, relief = 'groove')
+        self.chart.pack(side=TOP, fill=X, pady=5, expand=0 )
+        fig = Figure(figsize= (12,5), dpi = 100)
+        #fig.add_subplot.plot(df.index, df['Close'], color = "black", linewidth=0.9)
+        canvas = FigureCanvasTkAgg(fig, master = frame)
+        canvas.draw()
+        canvas.get_tk_widget().pack()
+        toolbar = NavigationToolbar2Tk(canvas, frame)
+        toolbar.update()
         
 
         #----Status log----------------------------------------------
