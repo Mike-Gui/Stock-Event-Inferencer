@@ -1,16 +1,11 @@
 # -*- coding: utf-8 -*-
 """
 Created on 9/8/2021 6:38pm
-@mikegui
-
-
 """
-
 from tkinter import *
 import tkinter
 import csv
 import pandas as pd
-#import matplotlib.pyplot as plt; plt.rcdefaults()
 import numpy as np
 from matplotlib import *
 import matplotlib.pyplot as plt
@@ -21,8 +16,6 @@ import time
 from time import sleep
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
-
-
 
 
 ###API Configs-----------------------------------------------------------------------------
@@ -67,7 +60,7 @@ class Menu:
         self.chartlabel.pack(side = BOTTOM)
         self.chart.pack(side=BOTTOM, pady = 5, padx=2.5, expand=0)
         #----Chart Display----------------------------------------------
-        self.chart = Button()
+
         
 
         #----Status log----------------------------------------------
@@ -84,11 +77,10 @@ class Menu:
           
           try:
               tickerGetFirst(self.t)
-              historicalData(self.t)
               self.x.configure(text = intradayChange) #sets the intraday change label to what is returned by the data from yahoo finance.
               self.x2.configure(text = "$"+ price) #sets the price label to what is returned by the data from yahoo finance.
               self.x3.configure(text = companyName)
-              
+              historicalData(self.t)
           except Exception as e: #if nothing is returned, the exception returns an error message
                print(e)
                self.listbox.insert(END, 'Error finding all ' + self.t.get()+ " data")
@@ -144,11 +136,10 @@ def historicalData(ticker):
     #print(df)
 
 ####ChartAssembly---------------------------------------------------------------------------------------------------------------------------------------------
-    #df.plot()    #x= 'Date', y = 'Close', kind = 'line', color = "black")
     plt.figure(figsize=(12,5))
     plt.plot(df.index, df['Close'], color = "black", linewidth=0.9)
-    plt.xlabel("date")
-    plt.ylabel("$ price")
+    plt.xlabel("Date")
+    plt.ylabel("Share price")
     plt.show()
 
 
