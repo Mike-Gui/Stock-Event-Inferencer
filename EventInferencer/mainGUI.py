@@ -47,7 +47,7 @@ def tickerAsk(): ##when the user presses "Find" after entering a stock ticker, t
 
         except Exception as e: #if nothing is returned, the exception returns an error message
             print(e)
-            listbox.insert(END, 'Error finding all ' + t.get()+ " data")
+            listbox.insert(END, 'Error finding all ' +  t.get() + " data, make sure the ticker symbol is correct")
 
 def clearButton(): ##update to remove all dynamic variables at the end
     listbox.delete(0, END) ## clears the listbox
@@ -93,9 +93,7 @@ def historicalData(ticker):
     interval = "1d" #1wk or 1m
     ticker = ticker.get()
     yahooQuery = f'https://query1.finance.yahoo.com/v7/finance/download/{ticker}?period1={period1}&period2={period2}&interval={interval}&events=history&includeAdjustedClose=true'
-    #print(yahooQuery)
     global df1
-    global df
     df1 = pd.read_csv(yahooQuery, parse_dates=["Date"], index_col ="Date")
     df1.drop('Open', axis=1, inplace=True)
     df1.drop('High', axis=1, inplace=True)
