@@ -169,9 +169,9 @@ def onStartCheck():
             #df2 = dfRetrieve(df)
             graph1 = fig.add_subplot(111)
             if posneg == 1:
-                graph1.plot(df1.index, df1['Close'], color = "#08c959", linewidth=0.9)
+                graph1.plot(df1.index, df1['Close'], color = "#08c959", linewidth=1.1)
             else:
-                graph1.plot(df1.index, df1['Close'], color = "#ed000c", linewidth=0.9)
+                graph1.plot(df1.index, df1['Close'], color = "#ed000c", linewidth=1.1)
             graph1.xaxis.set_major_formatter(mdates.DateFormatter('%Y/%m/%d'))
             graph1.grid(True)
             #graph1.plot.xlabel("Date")
