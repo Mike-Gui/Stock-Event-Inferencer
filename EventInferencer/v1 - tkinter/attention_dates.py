@@ -12,7 +12,7 @@ d0 = datetime.date(2021, 1, 1)
 d1 = datetime.date.today()
 days = d1 - d0
 days = days.days
-YourAPI_Token = "tb_930718fabb2a4750a1c00b38a1552097" #Your https://thebaite.com/ token goes here
+YourAPI_Token = "" #Your https://thebaite.com/ token goes here
 
 def attention(ticker):
     #ticker = ticker.get()
@@ -51,7 +51,7 @@ def attention(ticker):
         derIndex = ((MA7[n])-(MA7[m]))/2   
         deriv.append(derIndex)
         index_num.append(x)
-    #global max_dates
+
     df1.drop(df1.head(1).index,inplace=True) # drop first row
     df1.drop(df1.tail(1).index,inplace=True) # drop last row
     df1['∆^2'] = deriv
