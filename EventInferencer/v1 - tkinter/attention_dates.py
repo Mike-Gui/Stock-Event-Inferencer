@@ -25,10 +25,8 @@ def attention(ticker):
         print(e)
     r = json.dumps(rJson)
     s = json.loads(r)
-    global df_attention
     df_attention = pd.DataFrame(s)
     df_attention['t'] = pd.to_datetime(df_attention['t'],unit ='s').apply(lambda x: x.strftime('%m/%d/%Y'))
-    df_attention['t'] = pd.strftime(format ="%Y-%m-%d")
     df_attention.rename(columns={'t': 'Date','d': 'Attention Score'}, inplace=True)
     df_attention= df_attention.reindex(columns = ['Date', "Attention Score"])
     df_attention = df_attention.iloc[::-1]
