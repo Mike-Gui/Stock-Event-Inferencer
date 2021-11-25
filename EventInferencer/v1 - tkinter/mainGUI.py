@@ -5,22 +5,19 @@ Created on 9/8/2021 6:38pm
 from tkinter import *
 import tkinter as tk
 import pandas as pd
-import numpy as np
 from matplotlib import *
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import requests
 from bs4 import BeautifulSoup
 import datetime as datetime
 import time
-from time import sleep
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 import matplotlib.dates as mdates
-import twitterListener as TL 
 from random import randrange
-import mplfinance as mpf
+import attention_dates as Attention
 
-###Defaults--------------------------------------------------------------------------------
+#Defaults--------------------------------------------------------------------------------
 clear = 0
 #-------------------------------------------------------------
 def tickerAsk(): ##when the user presses "Find" after entering a stock ticker, this function is called, sending the user's input to a webscraper function in utilities.py
@@ -79,41 +76,44 @@ def tickerGetFirst(ticker):
           
 ####Historical Data Retriever---------------------------------------------------------------------------------------------------------------------------------
 def historicalData(ticker):
-    #dateselected = "1Year"# dateSelection
-    period1 = int(time.mktime((datetime.datetime.now() - datetime.timedelta(days = 365)).timetuple()))
+    d0 = datetime.date(2021, 1, 1)
+    d1 = datetime.date.today()
+    Days = d1 - d0
+    Days = Days.days
+    
+    period1 = int(time.mktime((datetime.datetime.now() - datetime.timedelta(days = Days)).timetuple()))
     period2 = int(time.mktime(datetime.datetime.now().timetuple()))
     interval = "1d" #1wk or 1m
     ticker = ticker.get()
     yahooQuery = f'https://query1.finance.yahoo.com/v7/finance/download/{ticker}?period1={period1}&period2={period2}&interval={interval}&events=history&includeAdjustedClose=true'
     global df1
     df1 = pd.read_csv(yahooQuery, parse_dates=["Date"], index_col ="Date")
-    # df1.drop('Open', axis=1, inplace=True)
-    # df1.drop('High', axis=1, inplace=True)
-    # df1.drop('Low', axis=1, inplace=True)
+    df1.drop('Open', axis=1, inplace=True)
+    df1.drop('High', axis=1, inplace=True)
+    df1.drop('Low', axis=1, inplace=True)
     df1.drop('Adj Close', axis=1, inplace=True)
-    # df1.drop('Volume', axis=1, inplace=True)
+    df1.drop('Volume', axis=1, inplace=True)
+    df1Length = int(len(df1))
+    df1Length = df1Length - 1
+    print(df1Length)
     #twitterSearch() ###Finance data is grabbed, then immediately sent to the twitterListener.py script for analysis. Days determined to be "Important" are returned in a dataframe and marked on the chart.
     try:
         global markerDates
-        markerDates = TL.markerDates(df1)
+        markerDates = Attention.attention(ticker)
+
         #print("df1 is" + len(df1)+ "long")
-        print(markerDates)
+        
     except Exception as e: 
         print(e)
 
 
     global priceChange1yr
     global posneg #identifier for YoY status
-    priceChange1yr = (df1['Close'].values[250])-(df1['Close'].values[0]) ##determines if the change over the last year was positive or negative
+    priceChange1yr = (df1['Close'].values[df1Length])-(df1['Close'].values[0]) ##determines if the change over the last year was positive or negative
     if priceChange1yr >= 0: #sets the posneg value to 1 if the price has increased or not moved in the last year
         posneg = 1
     else:
         posneg = 0
-
-#def twitterSearch(): ####sends retrieved dataframe to twitterListener.py for full data retrieval and returns analytical data 
-    #TL.dfRetrieve(df1.get()) ###Eventual frame work for matching twitter data and chart dates
-    #TL.dfRetrieve(df1) ###Eventual frame work for matching twitter data and chart dates
-    #return dfMarkerDates
 
 ####GUI Config-----------------------------------------------------------------------------
 root = tk.Tk()
@@ -202,6 +202,5 @@ root.configure(background="white")
 root.geometry("1200x706")
 root.title('Stock Event Inferencer')
 root.pack_propagate(1)
-#root.after(1000, windowRefresh)
 root.mainloop()
 
