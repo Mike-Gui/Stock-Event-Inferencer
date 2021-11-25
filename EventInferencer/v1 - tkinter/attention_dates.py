@@ -12,10 +12,8 @@ d0 = datetime.date(2021, 1, 1)
 d1 = datetime.date.today()
 days = d1 - d0
 days = days.days
+YourAPI_Token = "tb_930718fabb2a4750a1c00b38a1552097" #Your https://thebaite.com/ token goes here
 
-YourAPI_Token = "" #Your https://thebaite.com/ token goes here
-
-# Attention Request:
 def attention(ticker):
     #ticker = ticker.get()
     ticker = ticker.upper()
@@ -29,12 +27,13 @@ def attention(ticker):
     s = json.loads(r)
     global df_attention
     df_attention = pd.DataFrame(s)
-    df_attention['t'] = pd.to_datetime(df_attention['t'],unit ='s')
+    df_attention['t'] = pd.to_datetime(df_attention['t'],unit ='s').apply(lambda x: x.strftime('%m/%d/%Y'))
+    df_attention['t'] = pd.strftime(format ="%Y-%m-%d")
     df_attention.rename(columns={'t': 'Date','d': 'Attention Score'}, inplace=True)
     df_attention= df_attention.reindex(columns = ['Date', "Attention Score"])
     df_attention = df_attention.iloc[::-1]
     #df_sentiment.plot(y = 'Attention Score', x = 'Date', kind = 'line')
-    #df_sentiment.to_csv('C:/Users/mcgui/Desktop/Secondary/demo.csv', encoding = 'utf-8', index =False)
+    #df_sentiment.to_csv('C:/Users/mcgui/Desktop/Secondary/attention_output.csv', encoding = 'utf-8', index =False)
     #plt.title(f'{ticker} Attention Index Chart')
     #plt.show()
     df1 = df_attention 
@@ -62,15 +61,11 @@ def attention(ticker):
     df_maxdates = df1[(df1['∆^2']<0.15) & (df1['∆^2']>-0.15)] #Sensitivity scale of 0.15
     max_dates = df_maxdates.sort_values(by=['MA7']).tail(5) #Select top 5 days for attention within range
     markerDates = max_dates['index'].tolist()
+    markerDates.sort()
     print(max_dates)
     return markerDates
 
 
-
-
-
-
-#Sentiment Request
 # def sentiment():
 #     try:
 #         URL = f'http://thebaite.com:81/api/v1/stocks/metric?m=sentiment&d={days}&s={ticker}&token={YourAPI_Token}' ##Modify for your specific API Token
