@@ -18,7 +18,7 @@ def attention(ticker):
     #ticker = ticker.get()
     ticker = ticker.upper()
     try:
-        URL = f'http://thebaite.com:81/api/v1/stocks/metric?m=attention&d={days}&s={ticker}&token={YourAPI_Token}' ##Modify for your specific API Token
+        URL = f'http://thebaite.com:81/api/v1/stocks/metric?m=attention&d={days}&s={ticker}&token={YourAPI_Token}' 
         r = requests.get(URL)
         rJson =  r.json() 
     except Exception as e:
@@ -66,7 +66,7 @@ def attention(ticker):
 
 # def sentiment():
 #     try:
-#         URL = f'http://thebaite.com:81/api/v1/stocks/metric?m=sentiment&d={days}&s={ticker}&token={YourAPI_Token}' ##Modify for your specific API Token
+#         URL = f'http://thebaite.com:81/api/v1/stocks/metric?m=sentiment&d={days}&s={ticker}&token={YourAPI_Token}'
 #         r = requests.get(URL)
 #         rJson =  r.json()
 #     except Exception as e:
