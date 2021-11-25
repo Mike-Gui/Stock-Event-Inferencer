@@ -11,6 +11,10 @@ today_date = datetime.datetime.today() - datetime.timedelta(days=2)
 today_date = today_date.strftime('%Y-%m-%d')
 year_ago = datetime.datetime.today() - datetime.timedelta(days=365)
 year_ago = year_ago.strftime('%Y-%m-%d')
+
+
+
+
 # if the length of the chart df is shorter than 180 days (or 365 days), 
 #  increase the limits on likes and retweets. 
 #  Recently IPO'd companies will likely have more discussion
@@ -48,8 +52,8 @@ def locateRank(): #This def locates the appropriate search parameters for twint 
         rank_list_index = rank_df.loc[rank_df['Symbol'] == x_upper]
         indexed_mention = rank_list_index.iat[0,1]
         upvotes_index = rank_list_index.iat[0,2]
-        min_RetweetVal = indexed_mention*0.25
-        min_LikeVal = (indexed_mention**0.7)
+        min_RetweetVal = indexed_mention*0.15
+        min_LikeVal = (indexed_mention**0.4)
         popular_bool = True
         verified_bool = False
         if indexed_mention > 50:
@@ -114,7 +118,7 @@ def scrape():
     df2['tweet'] = df2['tweet'].str.replace('&amp;amp;', '&', case=False)
     df2['tweet'] = df2['tweet'].str.replace('&lt;', '<', case=False)
     df2['tweet'] = df2['tweet'].str.replace('&gt;', '>', case=False)
-    df2.to_csv(f'C:/Users/mcgui/Desktop/glungo/{x}.csv', encoding='utf-8-sig')
+    df2.to_csv(f'C:/Users/mcgui/Desktop/Secondary/{x}.csv', encoding='utf-8-sig')
 
 
 
@@ -128,6 +132,6 @@ print("searching twitter for " + x)
 locateRank()
 try:
     scrape()
-    print('current sentiment is ' , current_sentiment ,'based on ' , indexed_mention ,' mentions and ' , upvotes_index , ' upvotes')
+    print('current sentiment index is ' , current_sentiment ,' based on ' , indexed_mention ,' mentions and ' , upvotes_index , ' upvotes')
 except Exception as e: 
     print(e)
