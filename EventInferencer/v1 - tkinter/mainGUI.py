@@ -34,9 +34,9 @@ def tickerAsk(): ##when the user presses "Find" after entering a stock ticker, t
             lb3.configure(text = companyName)
             ####Conversion from day number to xx/xx/xxxx format should occur here
             
-            #markerdate_list = 
-            markerDatesListbox = ', '.join(str(e) for e in markerDates)
-            listbox.insert(END, "Days " + markerDatesListbox + " were found to be important")
+            
+            markerDatesListbox = ', '.join(str(e) for e in marker_dates)
+            listbox.insert(END, markerDatesListbox + " were found to be important")
         except Exception as e: #if nothing is returned, the exception returns an error message
             print(e)
             listbox.insert(END, 'Error finding all ' +  t.get() + " data, make sure the ticker symbol is correct")
@@ -97,16 +97,20 @@ def historicalData(ticker):
     df1.drop('Low', axis=1, inplace=True)
     df1.drop('Adj Close', axis=1, inplace=True)
     df1.drop('Volume', axis=1, inplace=True)
-
-    df1 = pd.merge_asof(fulldate_df, df1, on="Date") #, by="Date")
+    df1 = pd.merge_asof(fulldate_df, df1, on="Date") 
     df1['Date'] = pd.to_datetime(df1["Date"].dt.strftime('%Y-%m-%d'))
 
     df1Length = int(len(df1))
     df1Length = df1Length - 1
-    print(df1Length)
+
     try:
-        global markerDates
-        markerDates = Attention.attention(ticker)
+        global marker_dates
+        global marker_index
+        marker = Attention.attention(ticker)
+        marker_dates = marker['Date'].tolist()
+        marker_index = marker['index'].tolist()
+
+
     except Exception as e: 
         print(e)
 
@@ -114,6 +118,7 @@ def historicalData(ticker):
     global priceChange1yr
     global posneg #identifier for YoY status
     priceChange1yr = (df1['Close'].values[df1Length])-(df1['Close'].values[0]) ##determines if the change over the last year was positive or negative
+    print(priceChange1yr)
     if priceChange1yr >= 0: #sets the posneg value to 1 if the price has increased or not moved in the last year
         posneg = 1
     else:
@@ -181,10 +186,10 @@ def makeChart():
         graph1 = fig.add_subplot(111)
         #tw = [mpf.make_addplot(markerDates, scatter=True,markersize=7, marker="o", ax=graph1)]
         if posneg == 1:
-           graph1.plot(df1.index, df1['Close'], color = "#08c959", linewidth=0.9, linestyle='-', marker = 'o',ms=7, markerfacecolor = "#000000", markevery=markerDates)
+           graph1.plot(df1.index, df1['Close'], color = "#08c959", linewidth=0.9, linestyle='-', marker = 'o',ms=7, markerfacecolor = "#000000", markevery = marker_index)
            #mpf.plot(df1, type='candle', mav=50, ax=graph1, style='yahoo')#, volume=graph1)#,addplot=tw,
         else:
-           graph1.plot(df1.index, df1['Close'], color = "#ed000c", linewidth=0.9, linestyle='-', marker= 'o',ms=7, markerfacecolor = "#000000", markevery=markerDates )
+           graph1.plot(df1.index, df1['Close'], color = "#ed000c", linewidth=0.9, linestyle='-', marker= 'o',ms=7, markerfacecolor = "#000000", markevery = marker_index)
            #mpf.plot(df1, type='candle', mav=50, ax=graph1, style='yahoo')#, volume=graph1)#, addplot=tw,
         graph1.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d'))
 
