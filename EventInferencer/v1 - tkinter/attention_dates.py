@@ -2,7 +2,7 @@ import requests
 import json
 import pandas as pd
 import datetime
-#import matplotlib.pyplot  as plt
+import matplotlib.pyplot  as plt
 
 
 #User Entry Conditions
@@ -12,7 +12,7 @@ d0 = datetime.date(2021, 1, 1)
 d1 = datetime.date.today()
 days = d1 - d0
 days = days.days
-YourAPI_Token = "" #Your https://thebaite.com/ token goes here
+YourAPI_Token = "tb_930718fabb2a4750a1c00b38a1552097" #Your https://thebaite.com/ token goes here
 
 def attention(ticker):
     #ticker = ticker.get()
@@ -26,12 +26,12 @@ def attention(ticker):
     r = json.dumps(rJson)
     s = json.loads(r)
     df_attention = pd.DataFrame(s)
-    df_attention['t'] = pd.to_datetime(df_attention['t'],unit ='s').apply(lambda x: x.strftime('%m/%d/%Y'))
+    df_attention['t'] = pd.to_datetime(df_attention['t'],unit ='s').apply(lambda x: x.strftime('%Y-%m-%d'))
     df_attention.rename(columns={'t': 'Date','d': 'Attention Score'}, inplace=True)
     df_attention= df_attention.reindex(columns = ['Date', "Attention Score"])
     df_attention = df_attention.iloc[::-1]
-    #df_sentiment.plot(y = 'Attention Score', x = 'Date', kind = 'line')
-    #df_sentiment.to_csv('C:/Users/mcgui/Desktop/Secondary/attention_output.csv', encoding = 'utf-8', index =False)
+    #df_attention.plot(y = 'Attention Score', x = 'Date', kind = 'line')
+    #df_attention.to_csv('C:/Users/mcgui/Desktop/Secondary/attention_output.csv', encoding = 'utf-8', index =False)
     #plt.title(f'{ticker} Attention Index Chart')
     #plt.show()
     df1 = df_attention 
@@ -41,17 +41,16 @@ def attention(ticker):
     deriv = list()
     index_num = list()
     dflength = len(MA7)
-    x = dflength
+    x = 0
     for i in range(dflength):
         if i == dflength-2:
             break
         n = 2 + i
         m = i
-        x = (dflength-2) - i
+        x = x+1
         derIndex = ((MA7[n])-(MA7[m]))/2   
         deriv.append(derIndex)
         index_num.append(x)
-
     df1.drop(df1.head(1).index,inplace=True) # drop first row
     df1.drop(df1.tail(1).index,inplace=True) # drop last row
     df1['∆^2'] = deriv

@@ -33,6 +33,8 @@ def tickerAsk(): ##when the user presses "Find" after entering a stock ticker, t
             makeChart()
             lb3.configure(text = companyName)
             ####Conversion from day number to xx/xx/xxxx format should occur here
+            
+            #markerdate_list = 
             markerDatesListbox = ', '.join(str(e) for e in markerDates)
             listbox.insert(END, "Days " + markerDatesListbox + " were found to be important")
         except Exception as e: #if nothing is returned, the exception returns an error message
@@ -80,12 +82,14 @@ def historicalData(ticker):
     d1 = datetime.date.today()
     Days = d1 - d0
     Days = Days.days
-    
+    fulldate_df = df = pd.DataFrame({'Date':pd.date_range(start = d0, end = d1, periods = Days)})
+    fulldate_df['Date']= pd.to_datetime(fulldate_df['Date'],format='%Y-%m-%d')
+
     period1 = int(time.mktime((datetime.datetime.now() - datetime.timedelta(days = Days)).timetuple()))
     period2 = int(time.mktime(datetime.datetime.now().timetuple()))
     interval = "1d" #1wk or 1m
     ticker = ticker.get()
-    yahooQuery = f'https://query1.finance.yahoo.com/v7/finance/download/{ticker}?period1={period1}&period2={period2}&interval={interval}&events=history&includeAdjustedClose=true'
+    yahooQuery = f'https://query1.finance.yahoo.com/v7/finance/download/{ticker}?period1={period1}&period2={period2}&interval={interval}&events=history' #&includeAdjustedClose=true'
     global df1
     df1 = pd.read_csv(yahooQuery, parse_dates=["Date"], index_col ="Date")
     df1.drop('Open', axis=1, inplace=True)
@@ -93,16 +97,16 @@ def historicalData(ticker):
     df1.drop('Low', axis=1, inplace=True)
     df1.drop('Adj Close', axis=1, inplace=True)
     df1.drop('Volume', axis=1, inplace=True)
+
+    df1 = pd.merge_asof(fulldate_df, df1, on="Date") #, by="Date")
+    df1['Date'] = pd.to_datetime(df1["Date"].dt.strftime('%Y-%m-%d'))
+
     df1Length = int(len(df1))
     df1Length = df1Length - 1
     print(df1Length)
-    #twitterSearch() ###Finance data is grabbed, then immediately sent to the twitterListener.py script for analysis. Days determined to be "Important" are returned in a dataframe and marked on the chart.
     try:
         global markerDates
         markerDates = Attention.attention(ticker)
-
-        #print("df1 is" + len(df1)+ "long")
-        
     except Exception as e: 
         print(e)
 
