@@ -100,9 +100,7 @@ def historicalData(ticker):
 
     df1 = pd.merge_asof(fulldate_df, df1, on="Date") 
     df1['Date'] = pd.to_datetime(df1["Date"].dt.strftime('%Y-%m-%d'))
-    df1.to_csv("C:/Users/mcgui/Desktop/Secondary/df1_output.csv", encoding = 'utf-8')
     df1Length = len(df1) - 1
-    #df1Length = df1Length - 1
 
 
 # Retrieve data from API script------------------------------------------------------
@@ -123,8 +121,6 @@ def historicalData(ticker):
     global priceChange1yr
     global posneg #identifier for YoY status
     priceChange1yr = float(df1['Close'].values[df1Length])-float(df1['Close'].values[4]) ##determines if the change over the last year was positive or negative
-    #print(priceChange1yr)
-
     if priceChange1yr >= 0: #sets the posneg value to 1 if the price has increased or not moved in the last year
         posneg = 1
     else:
