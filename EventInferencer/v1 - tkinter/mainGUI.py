@@ -34,8 +34,8 @@ def tickerAsk(): ##when the user presses "Find" after entering a stock ticker, t
             lb3.configure(text = companyName)
             ####Conversion from day number to xx/xx/xxxx format should occur here
             
-            #markerdate_list = 
-            markerDatesListbox = ', '.join(str(e) for e in markerDates)
+ 
+            markerDatesListbox = ', '.join(str(e) for e in marker_dates)
             listbox.insert(END, "Days " + markerDatesListbox + " were found to be important")
         except Exception as e: #if nothing is returned, the exception returns an error message
             print(e)
@@ -82,12 +82,12 @@ def historicalData(ticker):
     d1 = datetime.date.today()
     Days = d1 - d0
     Days = Days.days
-    fulldate_df = df = pd.DataFrame({'Date':pd.date_range(start = d0, end = d1, periods = Days)})
-    fulldate_df['Date']= pd.to_datetime(fulldate_df['Date'],format='%Y-%m-%d')
+    fulldate_df = pd.DataFrame({'Date':pd.date_range(start = d0, end = d1, periods = Days)})
+    fulldate_df['Date'] = pd.to_datetime(fulldate_df['Date'],format='%Y-%m-%d')
 
     period1 = int(time.mktime((datetime.datetime.now() - datetime.timedelta(days = Days)).timetuple()))
     period2 = int(time.mktime(datetime.datetime.now().timetuple()))
-    interval = "1d" #1wk or 1m
+    interval = "1d"
     ticker = ticker.get()
     yahooQuery = f'https://query1.finance.yahoo.com/v7/finance/download/{ticker}?period1={period1}&period2={period2}&interval={interval}&events=history' #&includeAdjustedClose=true'
     global df1
@@ -98,22 +98,30 @@ def historicalData(ticker):
     df1.drop('Adj Close', axis=1, inplace=True)
     df1.drop('Volume', axis=1, inplace=True)
 
-    df1 = pd.merge_asof(fulldate_df, df1, on="Date") #, by="Date")
+    df1 = pd.merge_asof(fulldate_df, df1, on="Date") 
     df1['Date'] = pd.to_datetime(df1["Date"].dt.strftime('%Y-%m-%d'))
+    df1.to_csv("C:/Users/mcgui/Desktop/Secondary/df1_output.csv", encoding = 'utf-8')
+    df1Length = len(df1) - 1
 
-    df1Length = int(len(df1))
-    df1Length = df1Length - 1
-    print(df1Length)
+
+# Retrieve data from API script------------------------------------------------------
     try:
-        global markerDates
-        markerDates = Attention.attention(ticker)
+        global markers
+        global marker_index
+        global marker_dates
+        markers = Attention.attention(ticker)
+        marker_index = markers['index'].tolist()
+        marker_dates = markers['Date'].tolist()
+        marker_dates.sort()
+        print(markers)
     except Exception as e: 
         print(e)
-
+    
+#Determine if the 1yr price action is positive or negative----------------------------
 
     global priceChange1yr
     global posneg #identifier for YoY status
-    priceChange1yr = (df1['Close'].values[df1Length])-(df1['Close'].values[0]) ##determines if the change over the last year was positive or negative
+    priceChange1yr = float(df1['Close'].values[df1Length])-float(df1['Close'].values[4]) ##determines if the change over the last year was positive or negative
     if priceChange1yr >= 0: #sets the posneg value to 1 if the price has increased or not moved in the last year
         posneg = 1
     else:
@@ -181,13 +189,11 @@ def makeChart():
         graph1 = fig.add_subplot(111)
         #tw = [mpf.make_addplot(markerDates, scatter=True,markersize=7, marker="o", ax=graph1)]
         if posneg == 1:
-           graph1.plot(df1.index, df1['Close'], color = "#08c959", linewidth=0.9, linestyle='-', marker = 'o',ms=7, markerfacecolor = "#000000", markevery=markerDates)
-           #mpf.plot(df1, type='candle', mav=50, ax=graph1, style='yahoo')#, volume=graph1)#,addplot=tw,
+           graph1.plot(df1.index, df1['Close'], color = "#08c959", linewidth=0.9, linestyle='-', marker = 'o',ms=7, markerfacecolor = "#000000", markevery=marker_index)
         else:
-           graph1.plot(df1.index, df1['Close'], color = "#ed000c", linewidth=0.9, linestyle='-', marker= 'o',ms=7, markerfacecolor = "#000000", markevery=markerDates )
-           #mpf.plot(df1, type='candle', mav=50, ax=graph1, style='yahoo')#, volume=graph1)#, addplot=tw,
+           graph1.plot(df1.index, df1['Close'], color = "#ed000c", linewidth=0.9, linestyle='-', marker= 'o',ms=7, markerfacecolor = "#000000", markevery=marker_index )
         graph1.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d'))
-
+        #graph1.xaxis.set_ticks(12)
         graph1.grid(True)
         #graph1.set_xlabel("Date")
         graph1.set_ylabel("Price per Share")
@@ -197,8 +203,8 @@ def makeChart():
     windowRefresh()
 
 def windowRefresh(): #Allows for user input to change the matplot lib display within the tkinter window
-    xpar = randrange(7,9)
-    ypar = randrange(7,9)
+    xpar = randrange(7,10)
+    ypar = randrange(7,10)
     root.geometry(f'120{xpar}x70{ypar}')
 
 ##Root GUI Initiate-----------------------------------------------------------------------------------------------------
