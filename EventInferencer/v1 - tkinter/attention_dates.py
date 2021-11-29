@@ -25,7 +25,7 @@ def attention(ticker):
     r = json.dumps(rJson)
     s = json.loads(r)
     df_attention = pd.DataFrame(s)
-    df_attention['t'] = pd.to_datetime(df_attention['t'],unit ='s').apply(lambda x: x.strftime('%Y-%m-%d'))
+    df_attention['t'] = pd.to_datetime(df_attention['t'],unit ='s').apply(lambda x: x.strftime('%m/%d'))
     df_attention.rename(columns={'t': 'Date','d': 'Attention Score'}, inplace=True)
     df_attention= df_attention.reindex(columns = ['Date', "Attention Score"])
     df_attention = df_attention.iloc[::-1]
@@ -51,8 +51,6 @@ def attention(ticker):
     df1['∆^2'] = deriv
     df1['index'] = index_num
     df_maxdates = df1[(df1['∆^2']<0.15) & (df1['∆^2']>-0.15)] #Sensitivity scale of 0.15
-    max_dates = df_maxdates.sort_values(by=['MA7']).tail(5) #Select top 5 days for attention within range
-    markerDates = max_dates['index'].tolist()
-    markerDates.sort()
-    print(max_dates)
-    return markerDates
+    markers = df_maxdates.sort_values(by=['MA7']).tail(5) #Select top 5 days for attention within range
+
+    return markers
