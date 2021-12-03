@@ -12,12 +12,12 @@ d0 = datetime.date(2021, 1, 1)
 d1 = datetime.date.today()
 days = d1 - d0
 days = days.days
-YourAPI_Token = "tb_930718fabb2a4750a1c00b38a1552097" #Your https://thebaite.com/ token goes here
 
-def attention(ticker):
+def attention(ticker,api_token):
+
     ticker = ticker.upper()
     try:
-        URL = f'http://thebaite.com:81/api/v1/stocks/metric?m=attention&d={days}&s={ticker}&token={YourAPI_Token}' 
+        URL = f'http://thebaite.com:81/api/v1/stocks/metric?m=attention&d={days}&s={ticker}&token={api_token}' 
         r = requests.get(URL)
         rJson =  r.json() 
     except Exception as e:
@@ -25,7 +25,7 @@ def attention(ticker):
     r = json.dumps(rJson)
     s = json.loads(r)
     df_attention = pd.DataFrame(s)
-    df_attention['t'] = pd.to_datetime(df_attention['t'],unit ='s').apply(lambda x: x.strftime('%m/%d'))
+    df_attention['t'] = pd.to_datetime(df_attention['t'],unit ='s').apply(lambda x: x.strftime('%m/%d/%Y'))
     df_attention.rename(columns={'t': 'Date','d': 'Attention Score'}, inplace=True)
     df_attention= df_attention.reindex(columns = ['Date', "Attention Score"])
     df_attention = df_attention.iloc[::-1]
@@ -52,5 +52,5 @@ def attention(ticker):
     df1['index'] = index_num
     df_maxdates = df1[(df1['∆^2']<0.15) & (df1['∆^2']>-0.15)] #Sensitivity scale of 0.15
     markers = df_maxdates.sort_values(by=['MA7']).tail(5) #Select top 5 days for attention within range
-
+    print(markers)
     return markers

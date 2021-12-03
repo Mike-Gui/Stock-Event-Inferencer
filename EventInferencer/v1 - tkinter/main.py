@@ -16,9 +16,19 @@ from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationTool
 import matplotlib.dates as mdates
 from random import randrange
 import attention_dates as Attention
-
+import notice as notice
+import APIKEYS as APIKEYS
 #Defaults--------------------------------------------------------------------------------
 clear = 0
+day1 = ""
+day2 = ""
+day3 = ""
+day4 = ""
+day5 = ""
+ticker = "Null"
+#APIKeys---------------------------------------------------------------------------------
+noticeAPI = APIKEYS.usearch() #Retrieves and stores your usearch API token, if you've entered it
+attentionAPI = APIKEYS.bAIte() #Retrieves and stores your bAIte API token, if you've entered it
 #-------------------------------------------------------------
 def tickerAsk(): ##when the user presses "Find" after entering a stock ticker, this function is called, sending the user's input to a webscraper function in utilities.py
         listbox.insert(END,'"'+ t.get()+'"' + ' Selected')
@@ -33,7 +43,8 @@ def tickerAsk(): ##when the user presses "Find" after entering a stock ticker, t
             makeChart()
             lb3.configure(text = companyName)
             ####Conversion from day number to xx/xx/xxxx format should occur here
-            
+            global ticker
+            ticker = t.get()
  
             markerDatesListbox = ', '.join(str(e) for e in marker_dates)
             listbox.insert(END, "Days " + markerDatesListbox + " were found to be important")
@@ -49,9 +60,15 @@ def clearButton(): ##update to remove all dynamic variables at the end
     x3.configure(text = "")
     lb3.configure(text = "") ###company name above chart reset to ""
     global clear
+    global ticker
     clear = 1
     makeChart()
-
+    d1b['text'] = ""
+    d2b['text'] = ""
+    d3b['text'] = ""
+    d4b['text'] = ""
+    d5b['text'] = ""
+    ticker = "Null"
 
 ###Realtime price data from Yahoo Finance--------------------------------------------------------------------------------------------        
 def tickerGetFirst(ticker):
@@ -64,17 +81,8 @@ def tickerGetFirst(ticker):
     global price  
     global intradayChange
     companyName = yahoosoup.find('h1', {'class': 'D(ib) Fz(18px)'}).text ###parses the url html under the h1 tag for the company name
-    price = yahoosoup.find('span', {'class': 'Trsdu(0.3s) Fw(b) Fz(36px) Mb(-4px) D(ib)'}).text ### parses the url html under the span class for the current company price
-    intradayChange = yahoosoup.find('span', {'class': 'Trsdu(0.3s) Fw(500) Pstart(10px) Fz(24px) C($positiveColor)'})### parses for the current intraday change value
-        ### an if else state was required for intraday change, as the html string of the intradayChange changes depending on whether the stock is up or down for the day. This accounts for that.
-    if intradayChange == (None):
-        intradayChange = yahoosoup.find('span', {'class': 'Trsdu(0.3s) Fw(500) Pstart(10px) Fz(24px) C($negativeColor)'})
-    if intradayChange == (None):
-        intradayChange = yahoosoup.find('span', {'class': 'Trsdu(0.3s) Fw(500) Pstart(10px) Fz(24px)'}).text
-    elif intradayChange == yahoosoup.find('span', {'class': 'Trsdu(0.3s) Fw(500) Pstart(10px) Fz(24px) C($negativeColor)'}):
-        intradayChange = yahoosoup.find('span', {'class': 'Trsdu(0.3s) Fw(500) Pstart(10px) Fz(24px) C($negativeColor)'}).text
-    else:
-        intradayChange = yahoosoup.find('span', {'class': 'Trsdu(0.3s) Fw(500) Pstart(10px) Fz(24px) C($positiveColor)'}).text  
+    price = yahoosoup.find('fin-streamer', {'class': 'Fw(b) Fz(36px) Mb(-4px) D(ib)' }).text
+    intradayChange = yahoosoup.find('div', {'class': "D(ib) Mend(20px)"}).find_all('fin-streamer')[2].find_all('span')[0].text
           
 ####Historical Data Retriever---------------------------------------------------------------------------------------------------------------------------------
 def historicalData(ticker):
@@ -84,40 +92,53 @@ def historicalData(ticker):
     Days = Days.days
     fulldate_df = pd.DataFrame({'Date':pd.date_range(start = d0, end = d1, periods = Days)})
     fulldate_df['Date'] = pd.to_datetime(fulldate_df['Date'],format='%Y-%m-%d')
-
     period1 = int(time.mktime((datetime.datetime.now() - datetime.timedelta(days = Days)).timetuple()))
     period2 = int(time.mktime(datetime.datetime.now().timetuple()))
     interval = "1d"
     ticker = ticker.get()
     yahooQuery = f'https://query1.finance.yahoo.com/v7/finance/download/{ticker}?period1={period1}&period2={period2}&interval={interval}&events=history' #&includeAdjustedClose=true'
     global df1
+    global df1Length
     df1 = pd.read_csv(yahooQuery, parse_dates=["Date"], index_col ="Date")
     df1.drop('Open', axis=1, inplace=True)
     df1.drop('High', axis=1, inplace=True)
     df1.drop('Low', axis=1, inplace=True)
     df1.drop('Adj Close', axis=1, inplace=True)
     df1.drop('Volume', axis=1, inplace=True)
-
     df1 = pd.merge_asof(fulldate_df, df1, on="Date") 
     df1['Date'] = pd.to_datetime(df1["Date"].dt.strftime('%Y-%m-%d'))
     df1Length = len(df1) - 1
+    
 
-
-# Retrieve data from API script------------------------------------------------------
+#Retrieve data from API script------------------------------------------------------
     try:
         global markers
         global marker_index
         global marker_dates
-        markers = Attention.attention(ticker)
+        markers = Attention.attention(ticker, attentionAPI)
         marker_index = markers['index'].tolist()
         marker_dates = markers['Date'].tolist()
         marker_dates.sort()
-        print(markers)
+        #print(marker_dates)
+        global day1
+        global day2
+        global day3
+        global day4
+        global day5
+        day1 = marker_dates[0]
+        day2 = marker_dates[1]
+        day3 = marker_dates[2]
+        day4 = marker_dates[3]
+        day5 = marker_dates[4]
+        d1b['text'] = day1
+        d2b['text'] = day2
+        d3b['text'] = day3
+        d4b['text'] = day4
+        d5b['text'] = day5
     except Exception as e: 
         print(e)
     
 #Determine if the 1yr price action is positive or negative----------------------------
-
     global priceChange1yr
     global posneg #identifier for YoY status
     priceChange1yr = float(df1['Close'].values[df1Length])-float(df1['Close'].values[4]) ##determines if the change over the last year was positive or negative
@@ -125,6 +146,98 @@ def historicalData(ticker):
         posneg = 1
     else:
         posneg = 0
+#Reports ---------------------------------------------------------------------------
+def day1_report():
+    if ticker == "Null":
+        listbox.insert(END, 'Cannot generate a report yet')
+    else:
+        listbox.insert(END, 'Generating report for '+ day1+"...")
+        #articles = notice.dateRange(day1)
+        notice.dateRange(day1, companyName, noticeAPI)
+
+        new_window = Toplevel()
+        new_window.title(day1+ " Report")
+        new_window.geometry("400x700")
+        frame_new = Frame(new_window, width = 400, height=800)
+        frame_new.pack(expand = 1, fill=BOTH, side = TOP, anchor = N)
+        Font = ("Arial","20") 
+        date_label = Label(frame_new, text = day1, font = Font)
+        date_label.pack(side = TOP)
+        listbox.insert(END, 'Done.')
+
+def day2_report():
+    if ticker == "Null":
+        listbox.insert(END, 'Cannot generate a report yet')
+    else:
+        listbox.insert(END, 'Generating report for '+ day2+"...")
+        #articles = notice.dateRange(day1)
+        notice.dateRange(day2, companyName, noticeAPI)
+
+        new_window = Toplevel()
+        new_window.title(day2+ " Report")
+        new_window.geometry("400x700")
+        frame_new = Frame(new_window, width = 400, height=800)
+        frame_new.pack(expand = 1, fill=BOTH, side = TOP, anchor = N)
+        Font = ("Arial","20") 
+        date_label = Label(frame_new, text = day2, font = Font)
+        date_label.pack(side = TOP)
+        listbox.insert(END, 'Done.')
+
+def day3_report():
+    if ticker == "Null":
+        listbox.insert(END, 'Cannot generate a report yet')
+    else:
+        listbox.insert(END, 'Generating report for '+ day3+"...")
+        #articles = notice.dateRange(day1)
+        notice.dateRange(day3, companyName, noticeAPI)
+
+        new_window = Toplevel()
+        new_window.title(day3+ " Report")
+        new_window.geometry("400x700")
+        frame_new = Frame(new_window, width = 400, height=800)
+        frame_new.pack(expand = 1, fill=BOTH, side = TOP, anchor = N)
+        Font = ("Arial","20") 
+        date_label = Label(frame_new, text = day3, font = Font)
+        date_label.pack(side = TOP)
+        listbox.insert(END, 'Done.')
+
+def day4_report():
+
+    if ticker == "Null":
+        listbox.insert(END, 'Cannot generate a report yet')
+    else:
+        listbox.insert(END, 'Generating report for '+ day4+"...")
+        #articles = notice.dateRange(day1)
+        notice.dateRange(day4, companyName, noticeAPI)
+
+        new_window = Toplevel()
+        new_window.title(day4+ " Report")
+        new_window.geometry("400x700")
+        frame_new = Frame(new_window, width = 400, height=800)
+        frame_new.pack(expand = 1, fill=BOTH, side = TOP, anchor = N)
+        Font = ("Arial","20") 
+        date_label = Label(frame_new, text = day4, font = Font)
+        date_label.pack(side = TOP)
+        listbox.insert(END, 'Done.')
+
+def day5_report():
+    if ticker == "Null":
+        listbox.insert(END, 'Cannot generate a report yet')
+    else:
+        listbox.insert(END, 'Generating report for '+ day5+"...")
+        #articles = notice.dateRange(day1)
+        notice.dateRange(day5, companyName, noticeAPI)
+
+        new_window = Toplevel()
+        new_window.title(day5+ " Report")
+        new_window.geometry("400x700")
+        frame_new = Frame(new_window, width = 400, height=800)
+        frame_new.pack(expand = 1, fill=BOTH, side = TOP, anchor = N)
+        Font = ("Arial","20") 
+        date_label = Label(frame_new, text = day5, font = Font)
+        date_label.pack(side = TOP)
+        listbox.insert(END, 'Done.')
+
 
 ####GUI Config-----------------------------------------------------------------------------
 root = tk.Tk()
@@ -133,6 +246,21 @@ frame.pack(expand = 1, fill = X, side = TOP, anchor = N)
 #---------------------Criteria selection--------------------
 bbar = Frame(frame, relief = 'sunken', width=600, bd = 4)
 bbar.pack(expand = 1, fill = BOTH, side = BOTTOM, pady = 5)
+#Reports--------------------------------------------------
+reports = Frame(frame, bd= 2, relief= 'groove')
+reportlbl = Label(reports, text = "Reports:", font =('bold'))
+reportlbl.pack(side=LEFT)
+d5b = Button(reports, text = day5, command = day5_report)
+d4b = Button(reports, text = day4, command = day4_report)
+d3b = Button(reports, text = day3, command = day3_report)
+d2b = Button(reports, text = day2, command = day2_report)
+d1b = Button(reports, text = day1, command = day1_report)
+d5b.pack(side = RIGHT)
+d4b.pack(side = RIGHT)
+d3b.pack(side = RIGHT)
+d2b.pack(side = RIGHT)
+d1b.pack(side = RIGHT)
+reports.pack(side = BOTTOM, fill = X, expand = 0)
 #--------------------Ticker Entry---------------------------
 t = StringVar()
 ef = Frame(frame, bd=2, relief='groove')
@@ -172,6 +300,7 @@ listbox = Listbox(lf, height=5)
 b.pack(side=TOP, padx=5, fill=Y)
 listbox.pack(padx=5, fill = X)
 lf.pack(fill="both", expand=1, pady=5, before = bbar, side = BOTTOM)
+
 ###Chart Creator -------------------------------------------------------------------------------------------------
 fig = Figure(figsize= (12,5), dpi = 100)
 canvas = FigureCanvasTkAgg(fig, master = frame)
@@ -188,11 +317,12 @@ def makeChart():
         graph1 = fig.add_subplot(111)
         #tw = [mpf.make_addplot(markerDates, scatter=True,markersize=7, marker="o", ax=graph1)]
         if posneg == 1:
-           graph1.plot(df1.index, df1['Close'], color = "#08c959", linewidth=0.9, linestyle='-', marker = 'o',ms=7, markerfacecolor = "#000000", markevery=marker_index)
+           graph1.plot(df1.index, df1['Close'], color = "#08c959", linewidth=1.1, linestyle='-', marker = 'o',ms=7, markerfacecolor = "#000000", markevery=marker_index)
         else:
-           graph1.plot(df1.index, df1['Close'], color = "#ed000c", linewidth=0.9, linestyle='-', marker= 'o',ms=7, markerfacecolor = "#000000", markevery=marker_index )
+           graph1.plot(df1.index, df1['Close'], color = "#ed000c", linewidth=1.1, linestyle='-', marker= 'o',ms=7, markerfacecolor = "#000000", markevery=marker_index )
         graph1.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d'))
-        #graph1.xaxis.set_ticks(12)
+        a = list((range(1,(df1Length+30),30)))
+        graph1.xaxis.set_ticks(a)
         graph1.grid(True)
         #graph1.set_xlabel("Date")
         graph1.set_ylabel("Price per Share")
@@ -205,7 +335,6 @@ def windowRefresh(): #Allows for user input to change the matplot lib display wi
     xpar = randrange(7,10)
     ypar = randrange(7,10)
     root.geometry(f'120{xpar}x70{ypar}')
-
 ##Root GUI Initiate-----------------------------------------------------------------------------------------------------
 root.configure(background="white")
 root.geometry("1200x706")
