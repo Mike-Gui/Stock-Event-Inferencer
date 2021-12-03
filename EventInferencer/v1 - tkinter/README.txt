@@ -1,5 +1,3 @@
-In "bAIte_Attention.py", under line 21,  input your api token from https://thebaite.com/ .
+For this to work for you, open the APIKEYS.py script and enter your https://thebaite.com/  &  https://usearch.com/news-api/ API tokens.
 
-To run this program, run the "main.py" script.
-
-Enjoy!
+Next, run the main.py script 
