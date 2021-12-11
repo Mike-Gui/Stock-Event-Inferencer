@@ -3,6 +3,7 @@
 Created on 9/8/2021 6:38pm
 """
 from tkinter import *
+from tkinter import ttk
 import tkinter as tk
 import pandas as pd
 from matplotlib import *
@@ -109,7 +110,6 @@ def historicalData(ticker):
     df1['Date'] = pd.to_datetime(df1["Date"].dt.strftime('%Y-%m-%d'))
     df1Length = len(df1) - 1
     
-
 #Retrieve data from API script------------------------------------------------------
     try:
         global markers
@@ -152,17 +152,38 @@ def day1_report():
         listbox.insert(END, 'Cannot generate a report yet')
     else:
         listbox.insert(END, 'Generating report for '+ day1+"...")
-        #articles = notice.dateRange(day1)
-        notice.dateRange(day1, companyName, noticeAPI)
-
+        article_list = notice.dateRange(day1, companyName, noticeAPI)
         new_window = Toplevel()
         new_window.title(day1+ " Report")
-        new_window.geometry("400x700")
+        new_window.geometry("700x400")
+        Font = ("Arial","20")
         frame_new = Frame(new_window, width = 400, height=800)
         frame_new.pack(expand = 1, fill=BOTH, side = TOP, anchor = N)
-        Font = ("Arial","20") 
         date_label = Label(frame_new, text = day1, font = Font)
         date_label.pack(side = TOP)
+        canvas = tk.Canvas(frame_new)
+        scrollbar = ttk.Scrollbar(frame_new, orient="vertical", command=canvas.yview)
+        scrollable_frame = ttk.Frame(canvas)
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(
+                scrollregion=canvas.bbox("all")
+            )
+        )
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        ttk.Label(scrollable_frame, text=article_list[0]).pack(fill=BOTH,expand = Y, pady=5)
+        ttk.Label(scrollable_frame, text=article_list[1]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[2]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[3]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[4]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[5]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[6]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[7]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[8]).pack(fill=BOTH,expand = Y, pady=5)
+        ttk.Label(scrollable_frame, text=article_list[9]).pack(fill=BOTH,expand = Y, pady=5)
         listbox.insert(END, 'Done.')
 
 def day2_report():
@@ -170,17 +191,38 @@ def day2_report():
         listbox.insert(END, 'Cannot generate a report yet')
     else:
         listbox.insert(END, 'Generating report for '+ day2+"...")
-        #articles = notice.dateRange(day1)
-        notice.dateRange(day2, companyName, noticeAPI)
-
+        article_list = notice.dateRange(day2, companyName, noticeAPI)
         new_window = Toplevel()
         new_window.title(day2+ " Report")
-        new_window.geometry("400x700")
+        new_window.geometry("700x400")
+        Font = ("Arial","20")
         frame_new = Frame(new_window, width = 400, height=800)
         frame_new.pack(expand = 1, fill=BOTH, side = TOP, anchor = N)
-        Font = ("Arial","20") 
         date_label = Label(frame_new, text = day2, font = Font)
         date_label.pack(side = TOP)
+        canvas = tk.Canvas(frame_new)
+        scrollbar = ttk.Scrollbar(frame_new, orient="vertical", command=canvas.yview)
+        scrollable_frame = ttk.Frame(canvas)
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(
+                scrollregion=canvas.bbox("all")
+            )
+        )
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        ttk.Label(scrollable_frame, text=article_list[0]).pack(fill=BOTH,expand = Y, pady=5)
+        ttk.Label(scrollable_frame, text=article_list[1]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[2]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[3]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[4]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[5]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[6]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[7]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[8]).pack(fill=BOTH,expand = Y, pady=5)
+        ttk.Label(scrollable_frame, text=article_list[9]).pack(fill=BOTH,expand = Y, pady=5)
         listbox.insert(END, 'Done.')
 
 def day3_report():
@@ -188,17 +230,38 @@ def day3_report():
         listbox.insert(END, 'Cannot generate a report yet')
     else:
         listbox.insert(END, 'Generating report for '+ day3+"...")
-        #articles = notice.dateRange(day1)
-        notice.dateRange(day3, companyName, noticeAPI)
-
+        article_list = notice.dateRange(day3, companyName, noticeAPI)
         new_window = Toplevel()
         new_window.title(day3+ " Report")
-        new_window.geometry("400x700")
+        new_window.geometry("700x400")
+        Font = ("Arial","20")
         frame_new = Frame(new_window, width = 400, height=800)
         frame_new.pack(expand = 1, fill=BOTH, side = TOP, anchor = N)
-        Font = ("Arial","20") 
         date_label = Label(frame_new, text = day3, font = Font)
         date_label.pack(side = TOP)
+        canvas = tk.Canvas(frame_new)
+        scrollbar = ttk.Scrollbar(frame_new, orient="vertical", command=canvas.yview)
+        scrollable_frame = ttk.Frame(canvas)
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(
+                scrollregion=canvas.bbox("all")
+            )
+        )
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        ttk.Label(scrollable_frame, text=article_list[0]).pack(fill=BOTH,expand = Y, pady=5)
+        ttk.Label(scrollable_frame, text=article_list[1]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[2]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[3]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[4]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[5]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[6]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[7]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[8]).pack(fill=BOTH,expand = Y, pady=5)
+        ttk.Label(scrollable_frame, text=article_list[9]).pack(fill=BOTH,expand = Y, pady=5)
         listbox.insert(END, 'Done.')
 
 def day4_report():
@@ -207,17 +270,38 @@ def day4_report():
         listbox.insert(END, 'Cannot generate a report yet')
     else:
         listbox.insert(END, 'Generating report for '+ day4+"...")
-        #articles = notice.dateRange(day1)
-        notice.dateRange(day4, companyName, noticeAPI)
-
+        article_list = notice.dateRange(day4, companyName, noticeAPI)
         new_window = Toplevel()
         new_window.title(day4+ " Report")
-        new_window.geometry("400x700")
+        new_window.geometry("700x400")
+        Font = ("Arial","20")
         frame_new = Frame(new_window, width = 400, height=800)
         frame_new.pack(expand = 1, fill=BOTH, side = TOP, anchor = N)
-        Font = ("Arial","20") 
         date_label = Label(frame_new, text = day4, font = Font)
         date_label.pack(side = TOP)
+        canvas = tk.Canvas(frame_new)
+        scrollbar = ttk.Scrollbar(frame_new, orient="vertical", command=canvas.yview)
+        scrollable_frame = ttk.Frame(canvas)
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(
+                scrollregion=canvas.bbox("all")
+            )
+        )
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        ttk.Label(scrollable_frame, text=article_list[0]).pack(fill=BOTH,expand = Y, pady=5)
+        ttk.Label(scrollable_frame, text=article_list[1]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[2]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[3]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[4]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[5]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[6]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[7]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[8]).pack(fill=BOTH,expand = Y, pady=5)
+        ttk.Label(scrollable_frame, text=article_list[9]).pack(fill=BOTH,expand = Y, pady=5)
         listbox.insert(END, 'Done.')
 
 def day5_report():
@@ -225,17 +309,38 @@ def day5_report():
         listbox.insert(END, 'Cannot generate a report yet')
     else:
         listbox.insert(END, 'Generating report for '+ day5+"...")
-        #articles = notice.dateRange(day1)
-        notice.dateRange(day5, companyName, noticeAPI)
-
+        article_list = notice.dateRange(day5, companyName, noticeAPI)
         new_window = Toplevel()
         new_window.title(day5+ " Report")
-        new_window.geometry("400x700")
+        new_window.geometry("700x400")
+        Font = ("Arial","20")
         frame_new = Frame(new_window, width = 400, height=800)
         frame_new.pack(expand = 1, fill=BOTH, side = TOP, anchor = N)
-        Font = ("Arial","20") 
         date_label = Label(frame_new, text = day5, font = Font)
         date_label.pack(side = TOP)
+        canvas = tk.Canvas(frame_new)
+        scrollbar = ttk.Scrollbar(frame_new, orient="vertical", command=canvas.yview)
+        scrollable_frame = ttk.Frame(canvas)
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(
+                scrollregion=canvas.bbox("all")
+            )
+        )
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        ttk.Label(scrollable_frame, text=article_list[0]).pack(fill=BOTH,expand = Y, pady=5)
+        ttk.Label(scrollable_frame, text=article_list[1]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[2]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[3]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[4]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[5]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[6]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[7]).pack(fill=BOTH,expand = Y,pady=5)
+        ttk.Label(scrollable_frame, text=article_list[8]).pack(fill=BOTH,expand = Y, pady=5)
+        ttk.Label(scrollable_frame, text=article_list[9]).pack(fill=BOTH,expand = Y, pady=5)
         listbox.insert(END, 'Done.')
 
 
@@ -300,7 +405,6 @@ listbox = Listbox(lf, height=5)
 b.pack(side=TOP, padx=5, fill=Y)
 listbox.pack(padx=5, fill = X)
 lf.pack(fill="both", expand=1, pady=5, before = bbar, side = BOTTOM)
-
 ###Chart Creator -------------------------------------------------------------------------------------------------
 fig = Figure(figsize= (12,5), dpi = 100)
 canvas = FigureCanvasTkAgg(fig, master = frame)
@@ -315,11 +419,11 @@ def makeChart():
     else:
         fig.clear()
         graph1 = fig.add_subplot(111)
-        #tw = [mpf.make_addplot(markerDates, scatter=True,markersize=7, marker="o", ax=graph1)]
+        
         if posneg == 1:
-           graph1.plot(df1.index, df1['Close'], color = "#08c959", linewidth=1.1, linestyle='-', marker = 'o',ms=7, markerfacecolor = "#000000", markevery=marker_index)
+           graph1.plot(df1.index, df1['Close'], color = "#08c959", linewidth=0.9, linestyle='-', marker = 'o',ms=7, markerfacecolor = "#000000", markevery=marker_index)
         else:
-           graph1.plot(df1.index, df1['Close'], color = "#ed000c", linewidth=1.1, linestyle='-', marker= 'o',ms=7, markerfacecolor = "#000000", markevery=marker_index )
+           graph1.plot(df1.index, df1['Close'], color = "#ed000c", linewidth=0.9, linestyle='-', marker= 'o',ms=7, markerfacecolor = "#000000", markevery=marker_index )
         graph1.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d'))
         a = list((range(1,(df1Length+30),30)))
         graph1.xaxis.set_ticks(a)
@@ -332,8 +436,8 @@ def makeChart():
     windowRefresh()
 
 def windowRefresh(): #Allows for user input to change the matplot lib display within the tkinter window
-    xpar = randrange(7,10)
-    ypar = randrange(7,10)
+    xpar = randrange(4,9)
+    ypar = randrange(4,9)
     root.geometry(f'120{xpar}x70{ypar}')
 ##Root GUI Initiate-----------------------------------------------------------------------------------------------------
 root.configure(background="white")
