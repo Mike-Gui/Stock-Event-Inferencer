@@ -13,7 +13,7 @@ from bs4 import BeautifulSoup
 import datetime as datetime
 import time
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.dates as mdates
 from random import randrange
 import attention_dates as Attention
@@ -71,7 +71,7 @@ def clearButton(): ##update to remove all dynamic variables at the end
     d5b['text'] = ""
     ticker = "Null"
 
-###Realtime price data from Yahoo Finance--------------------------------------------------------------------------------------------        
+###Realtime price data from Yahoo Finance--------------------------------------------------------------------------------------------------------------------        
 def tickerGetFirst(ticker):
     headers= {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'}
     ticker = ticker.get() ### retrieves the ticker from the main.py user entry request
@@ -84,7 +84,39 @@ def tickerGetFirst(ticker):
     companyName = yahoosoup.find('h1', {'class': 'D(ib) Fz(18px)'}).text ###parses the url html under the h1 tag for the company name
     price = yahoosoup.find('fin-streamer', {'class': 'Fw(b) Fz(36px) Mb(-4px) D(ib)' }).text
     intradayChange = yahoosoup.find('div', {'class': "D(ib) Mend(20px)"}).find_all('fin-streamer')[2].find_all('span')[0].text
-          
+###Earnings dates and data retrieval-------------------------------------------------------------------------------------------------------------------------
+def earnings_dates(ticker):
+    #ticker = ticker.get()
+    currentday = datetime.datetime.today()
+    firstdate = datetime.datetime(2020, 1, 1)
+    try:
+        headers= {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'}
+        #ticker = ticker.get() ### retrieves the ticker from the main.py user entry request
+        yahoourl = f'https://finance.yahoo.com/calendar/earnings?symbol={ticker}' 
+        r1 = requests.get(yahoourl, headers=headers)
+        yahoosoup = BeautifulSoup(r1.text, 'html.parser')
+        earnings_list = list()
+        global e_list
+        e_list = list()
+        for i in range(0,12):
+            er_1 = yahoosoup.find('table', {'class': 'W(100%)'}).find('tbody').find_all('tr')[i].find_all('td')[2].text
+            er_1 = str(er_1[:-9])
+            er_1 = er_1.replace(",","")
+            er_1 = datetime.datetime.strptime(er_1, '%b %d %Y')
+            earnings_list.append(er_1)
+        e_list.sort()
+
+        for i in range(0,9):
+            if earnings_list[i] < currentday and earnings_list[i] > firstdate:
+                e_list.append(earnings_list[i])
+        e_list = list(set(e_list))
+        e_list.sort()
+        e_list.reverse()
+        
+    except Exception as e:
+        print(e)
+        print("not enough earnings previous dates")
+   
 ####Historical Data Retriever---------------------------------------------------------------------------------------------------------------------------------
 def historicalData(ticker):
     d0 = datetime.date(2021, 1, 1)
@@ -120,11 +152,9 @@ def historicalData(ticker):
         marker_dates = markers['Date'].tolist()
         marker_dates.sort()
         #print(marker_dates)
-        global day1
-        global day2
-        global day3
-        global day4
-        global day5
+        global day1, day2, day3, day4, day5
+        global day1_dt, day2_dt, day3_dt, day4_dt, day5_dt
+
         day1 = marker_dates[0]
         day2 = marker_dates[1]
         day3 = marker_dates[2]
@@ -135,6 +165,11 @@ def historicalData(ticker):
         d3b['text'] = day3
         d4b['text'] = day4
         d5b['text'] = day5
+        day1_dt = datetime.datetime.strptime(day1, '%m/%d/%Y')
+        day2_dt = datetime.datetime.strptime(day2, '%m/%d/%Y')
+        day3_dt = datetime.datetime.strptime(day3, '%m/%d/%Y')
+        day4_dt = datetime.datetime.strptime(day4, '%m/%d/%Y')
+        day5_dt = datetime.datetime.strptime(day5, '%m/%d/%Y')
     except Exception as e: 
         print(e)
     
@@ -174,6 +209,17 @@ def day1_report():
         canvas.configure(yscrollcommand=scrollbar.set)
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
+        earnings_dates(ticker)
+        recent_er = list()
+
+        print(e_list)
+        for i in e_list:
+            if i < day1_dt:
+                prevER1 = i
+                recent_er.append(prevER1)
+        prevER1 = recent_er[0]
+        prevER1 = prevER1.strftime('%m/%d/%Y')
+        ttk.Label(scrollable_frame, text="Most recent earnings date "+prevER1, font = 'bold').pack(fill=BOTH,expand = Y, pady=10)
         ttk.Label(scrollable_frame, text=article_list[0]).pack(fill=BOTH,expand = Y, pady=5)
         ttk.Label(scrollable_frame, text=article_list[1]).pack(fill=BOTH,expand = Y,pady=5)
         ttk.Label(scrollable_frame, text=article_list[2]).pack(fill=BOTH,expand = Y,pady=5)
@@ -213,6 +259,17 @@ def day2_report():
         canvas.configure(yscrollcommand=scrollbar.set)
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
+        earnings_dates(ticker)
+        recent_er = list()
+
+        print(e_list)
+        for i in e_list:
+            if i < day2_dt:
+                prevER2 = i
+                recent_er.append(prevER2)
+        prevER2 = recent_er[0]
+        prevER2 = prevER2.strftime('%m/%d/%Y')
+        ttk.Label(scrollable_frame, text="Most recent earnings date "+prevER2, font = 'bold').pack(fill=BOTH,expand = Y, pady=10)
         ttk.Label(scrollable_frame, text=article_list[0]).pack(fill=BOTH,expand = Y, pady=5)
         ttk.Label(scrollable_frame, text=article_list[1]).pack(fill=BOTH,expand = Y,pady=5)
         ttk.Label(scrollable_frame, text=article_list[2]).pack(fill=BOTH,expand = Y,pady=5)
@@ -252,6 +309,17 @@ def day3_report():
         canvas.configure(yscrollcommand=scrollbar.set)
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
+        earnings_dates(ticker)
+        recent_er = list()
+
+        print(e_list)
+        for i in e_list:
+            if i < day3_dt:
+                prevER3 = i
+                recent_er.append(prevER3)
+        prevER3 = recent_er[0]
+        prevER3 = prevER3.strftime('%m/%d/%Y')  
+        ttk.Label(scrollable_frame, text="Most recent earnings date "+prevER3, font = 'bold').pack(fill=BOTH,expand = Y, pady=10)
         ttk.Label(scrollable_frame, text=article_list[0]).pack(fill=BOTH,expand = Y, pady=5)
         ttk.Label(scrollable_frame, text=article_list[1]).pack(fill=BOTH,expand = Y,pady=5)
         ttk.Label(scrollable_frame, text=article_list[2]).pack(fill=BOTH,expand = Y,pady=5)
@@ -292,6 +360,17 @@ def day4_report():
         canvas.configure(yscrollcommand=scrollbar.set)
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
+        earnings_dates(ticker)
+        recent_er = list()
+
+        print(e_list)
+        for i in e_list:
+            if i < day4_dt:
+                prevER4 = i
+                recent_er.append(prevER4)
+        prevER4 = recent_er[0]
+        prevER4 = prevER4.strftime('%m/%d/%Y')
+        ttk.Label(scrollable_frame, text="Most recent earnings date "+prevER4, font = 'bold').pack(fill=BOTH,expand = Y, pady=10)
         ttk.Label(scrollable_frame, text=article_list[0]).pack(fill=BOTH,expand = Y, pady=5)
         ttk.Label(scrollable_frame, text=article_list[1]).pack(fill=BOTH,expand = Y,pady=5)
         ttk.Label(scrollable_frame, text=article_list[2]).pack(fill=BOTH,expand = Y,pady=5)
@@ -331,6 +410,16 @@ def day5_report():
         canvas.configure(yscrollcommand=scrollbar.set)
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
+        earnings_dates(ticker)
+        recent_er = list()
+        print(e_list)
+        for i in e_list:
+            if i < day5_dt:
+                prevER5 = i
+                recent_er.append(prevER5)
+        prevER5 = recent_er[0]
+        prevER5 = prevER5.strftime('%m/%d/%Y')
+        ttk.Label(scrollable_frame, text="Most recent earnings date "+prevER5, font = 'bold').pack(fill=BOTH,expand = Y, pady=10)
         ttk.Label(scrollable_frame, text=article_list[0]).pack(fill=BOTH,expand = Y, pady=5)
         ttk.Label(scrollable_frame, text=article_list[1]).pack(fill=BOTH,expand = Y,pady=5)
         ttk.Label(scrollable_frame, text=article_list[2]).pack(fill=BOTH,expand = Y,pady=5)
@@ -419,13 +508,12 @@ def makeChart():
     else:
         fig.clear()
         graph1 = fig.add_subplot(111)
-        
         if posneg == 1:
            graph1.plot(df1.index, df1['Close'], color = "#08c959", linewidth=0.9, linestyle='-', marker = 'o',ms=7, markerfacecolor = "#000000", markevery=marker_index)
         else:
            graph1.plot(df1.index, df1['Close'], color = "#ed000c", linewidth=0.9, linestyle='-', marker= 'o',ms=7, markerfacecolor = "#000000", markevery=marker_index )
         graph1.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d'))
-        a = list((range(1,(df1Length+30),30)))
+        a = list((range(1,(df1Length+30),30))) #Sets the tick length to one month
         graph1.xaxis.set_ticks(a)
         graph1.grid(True)
         #graph1.set_xlabel("Date")
