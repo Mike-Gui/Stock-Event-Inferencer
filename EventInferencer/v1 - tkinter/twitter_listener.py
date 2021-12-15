@@ -40,13 +40,7 @@ def locateRank(): #This def locates the appropriate search parameters for twint 
     rank_df = pd.DataFrame({'Symbol':symbol_list, 'Mentions':mentions_list, 'Upvotes':upvotes_list})
     #rank_df = rank_df.drop_duplicates()
     print(rank_df)
-    global min_RetweetVal
-    global min_LikeVal
-    global verified_bool
-    global popular_bool
-    global current_sentiment
-    global indexed_mention
-    global upvotes_index
+    global min_RetweetVal, min_LikeVal, verified_bool, popular_bool, current_sentiment, indexed_mention, upvotes_index
     inList_count = rank_df['Symbol'].str.contains(x_upper).sum()
     if inList_count>0:        
         rank_list_index = rank_df.loc[rank_df['Symbol'] == x_upper]
@@ -54,7 +48,7 @@ def locateRank(): #This def locates the appropriate search parameters for twint 
         upvotes_index = rank_list_index.iat[0,2]
         min_RetweetVal = indexed_mention*0.15
         min_LikeVal = (indexed_mention**0.4)
-        popular_bool = True
+        popular_bool = False
         verified_bool = False
         if indexed_mention > 50:
             verified_bool = False
@@ -92,7 +86,10 @@ def scrape():
     df2=pd.DataFrame(Tweets_df)
     if len(df2) == 0:
         print("no tweets found, sorry!")
+        global no_tweets
+        no_tweets = 1
     else:
+        no_tweets = 0
         df2.drop(["place","photos",
         "nreplies","place", "link","quote_url",
         "video","thumbnail","near","geo","source",
