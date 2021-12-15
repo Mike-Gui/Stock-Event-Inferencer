@@ -86,7 +86,7 @@ def tickerGetFirst(ticker):
     intradayChange = yahoosoup.find('div', {'class': "D(ib) Mend(20px)"}).find_all('fin-streamer')[2].find_all('span')[0].text
 ###Earnings dates and data retrieval-------------------------------------------------------------------------------------------------------------------------
 def earnings_dates(ticker):
-    #ticker = ticker.get()
+    
     currentday = datetime.datetime.today()
     firstdate = datetime.datetime(2020, 1, 1)
     try:
@@ -105,7 +105,6 @@ def earnings_dates(ticker):
             er_1 = datetime.datetime.strptime(er_1, '%b %d %Y')
             earnings_list.append(er_1)
         e_list.sort()
-
         for i in range(0,9):
             if earnings_list[i] < currentday and earnings_list[i] > firstdate:
                 e_list.append(earnings_list[i])
@@ -214,7 +213,7 @@ def day1_report():
 
         print(e_list)
         for i in e_list:
-            if i < day1_dt:
+            if i < (day1_dt+datetime.timedelta(days=7)):
                 prevER1 = i
                 recent_er.append(prevER1)
         prevER1 = recent_er[0]
@@ -264,7 +263,7 @@ def day2_report():
 
         print(e_list)
         for i in e_list:
-            if i < day2_dt:
+            if i < (day2_dt+datetime.timedelta(days=7)):
                 prevER2 = i
                 recent_er.append(prevER2)
         prevER2 = recent_er[0]
@@ -314,7 +313,7 @@ def day3_report():
 
         print(e_list)
         for i in e_list:
-            if i < day3_dt:
+            if i < (day3_dt+datetime.timedelta(days=7)):
                 prevER3 = i
                 recent_er.append(prevER3)
         prevER3 = recent_er[0]
@@ -365,7 +364,7 @@ def day4_report():
 
         print(e_list)
         for i in e_list:
-            if i < day4_dt:
+            if i < (day4_dt+datetime.timedelta(days=7)):
                 prevER4 = i
                 recent_er.append(prevER4)
         prevER4 = recent_er[0]
@@ -414,7 +413,7 @@ def day5_report():
         recent_er = list()
         print(e_list)
         for i in e_list:
-            if i < day5_dt:
+            if i < (day5_dt+datetime.timedelta(days=7)):
                 prevER5 = i
                 recent_er.append(prevER5)
         prevER5 = recent_er[0]
