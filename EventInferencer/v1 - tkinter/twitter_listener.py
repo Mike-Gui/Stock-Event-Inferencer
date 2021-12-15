@@ -7,10 +7,10 @@ import requests
 
 #pip3 install --upgrade -e git+https://github.com/twintproject/twint.git@origin/master#egg=twint
 
-today_date = datetime.datetime.today() - datetime.timedelta(days=2)
-today_date = today_date.strftime('%Y-%m-%d')
-year_ago = datetime.datetime.today() - datetime.timedelta(days=365)
-year_ago = year_ago.strftime('%Y-%m-%d')
+# today_date = datetime.datetime.today() - datetime.timedelta(days=2)
+# today_date = today_date.strftime('%Y-%m-%d')
+# year_ago = datetime.datetime.today() - datetime.timedelta(days=365)
+# year_ago = year_ago.strftime('%Y-%m-%d')
 
 
 
@@ -64,7 +64,7 @@ def locateRank(): #This def locates the appropriate search parameters for twint 
     else:
         print("not in list, setting default settings")
         min_RetweetVal = 5
-        min_LikeVal = 10
+        min_LikeVal = 5
         verified_bool = False
         popular_bool = False
         upvotes_index = "unknown"
@@ -75,8 +75,8 @@ def scrape():
     c = twint.Config()
     c.Search = x
     c.Limit = 2000
-    c.Since= str(year_ago)
-    c.Until= str(today_date)
+    c.Since= str(d1)
+    c.Until= str(d2)
     c.Images= False
     c.Pandas = True
     c.Lang = "en"
@@ -90,44 +90,53 @@ def scrape():
     twint.run.Search(c)
     Tweets_df = twint.storage.panda.Tweets_df
     df2=pd.DataFrame(Tweets_df)
-    df2.drop(["place","photos",
-    "nreplies","place", "link","quote_url",
-    "video","thumbnail","near","geo","source",
-    "user_rt_id","user_rt","place", "retweet_id",
-    "reply_to","retweet_date", "urls", "translate", 
-    "trans_src", "trans_dest","retweet", "day", "hour",
-    "created_at","name", "username","conversation_id", "user_id", "user_id_str", "id"], axis=1, inplace=True)
-    #####Remove items containing urls
-    #print(list(df2.columns.values))
-    df2 = df2[df2.language == "en"]
-    #df2 = df2[df2['tweet'].str.contains("OPTIONS|Options|options|Calls|Puts|C>|P<|Gain|Alerted|ALERT|Alert")==False]  #Rewrite as multiple inclusion drop function
-    df2 = df2[df2['tweet'].str.contains("Options")==False]
-    df2 = df2[df2['tweet'].str.contains("options")==False]  
-    df2 = df2[df2['tweet'].str.contains("Calls")==False]
-    df2 = df2[df2['tweet'].str.contains("Puts")==False]
-    df2 = df2[df2['tweet'].str.contains("C>")==False]
-    df2 = df2[df2['tweet'].str.contains("P<")==False]
-    df2 = df2[df2['tweet'].str.contains("GAIN")==False]
-    df2 = df2[df2['tweet'].str.contains("Alerted")==False]
-    df2 = df2[df2['tweet'].str.contains("ALERT")==False]
-    df2 = df2[df2['tweet'].str.contains("Alert")==False]
-    #df2=df2[df2['cashtags'].str.contains("[rblx]")==True]
-    df2.drop(["language"], axis=1, inplace=True)
-    df2['tweet'] = df2['tweet'].str.replace('http\S+|www.\S+', '', case=False)
-    df2['tweet'] = df2['tweet'].str.replace('&lt;/?[a-z]+&gt;', '', case=False)
-    df2['tweet'] = df2['tweet'].str.replace('&amp;amp;', '&', case=False)
-    df2['tweet'] = df2['tweet'].str.replace('&lt;', '<', case=False)
-    df2['tweet'] = df2['tweet'].str.replace('&gt;', '>', case=False)
-    df2.to_csv(f'C:/Users/mcgui/Desktop/Secondary/{x}.csv', encoding='utf-8-sig')
+    if len(df2) == 0:
+        print("no tweets found, sorry!")
+    else:
+        df2.drop(["place","photos",
+        "nreplies","place", "link","quote_url",
+        "video","thumbnail","near","geo","source",
+        "user_rt_id","user_rt","place", "retweet_id",
+        "reply_to","retweet_date", "urls", "translate", 
+        "trans_src", "trans_dest","retweet", "day", "hour",
+        "created_at","name", "username","conversation_id", "user_id", "user_id_str", "id"], axis=1, inplace=True)
+        #####Remove items containing urls
+
+        df2 = df2[df2.language == "en"]
+        #df2 = df2[df2['tweet'].str.contains("OPTIONS|Options|options|Calls|Puts|C>|P<|Gain|Alerted|ALERT|Alert")==False]  #Rewrite as multiple inclusion drop function
+        df2 = df2[df2['tweet'].str.contains("Options")==False]
+        df2 = df2[df2['tweet'].str.contains("options")==False]  
+        df2 = df2[df2['tweet'].str.contains("Calls")==False]
+        df2 = df2[df2['tweet'].str.contains("Puts")==False]
+        df2 = df2[df2['tweet'].str.contains("C>")==False]
+        df2 = df2[df2['tweet'].str.contains("P<")==False]
+        df2 = df2[df2['tweet'].str.contains("GAIN")==False]
+        df2 = df2[df2['tweet'].str.contains("Alerted")==False]
+        df2 = df2[df2['tweet'].str.contains("ALERT")==False]
+        df2 = df2[df2['tweet'].str.contains("Alert")==False]
+        df2.drop(["language"], axis=1, inplace=True)
+        df2['tweet'] = df2['tweet'].str.replace('http\S+|www.\S+', '', case=False)
+        df2['tweet'] = df2['tweet'].str.replace('&lt;/?[a-z]+&gt;', '', case=False)
+        df2['tweet'] = df2['tweet'].str.replace('&amp;amp;', '&', case=False)
+        df2['tweet'] = df2['tweet'].str.replace('&lt;', '<', case=False)
+        df2['tweet'] = df2['tweet'].str.replace('&gt;', '>', case=False)
+        df2.to_csv(f'C:/Users/mcgui/Desktop/Secondary/{x}.csv', encoding='utf-8-sig')
 
 
 
-x=input('Enter a Ticker:')
+x = input('Enter a Ticker:')
+startdate = input('Enter date to search around (mm/dd/yyyy): ')
 x = x.upper()
 x_upper = x
 x = "$"+ x
 x=str(x)
 print("searching twitter for " + x)
+startdate = datetime.datetime.strptime(startdate,'%m/%d/%Y')
+d1 = startdate+datetime.timedelta(days=7)
+d2 = startdate-datetime.timedelta(days=7)
+d1 = d1.strftime('%Y-%m-%d')
+d2 = d2.strftime('%Y-%m-%d')
+
 
 locateRank()
 try:
