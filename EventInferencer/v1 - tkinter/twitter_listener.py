@@ -75,8 +75,8 @@ def scrape():
     c = twint.Config()
     c.Search = x
     c.Limit = 2000
-    c.Since= str(d1)
-    c.Until= str(d2)
+    c.Since= str(d2)
+    c.Until= str(d1)
     c.Images= False
     c.Pandas = True
     c.Lang = "en"
