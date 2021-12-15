@@ -117,7 +117,7 @@ def scrape():
         df2['tweet'] = df2['tweet'].str.replace('&amp;amp;', '&', case=False)
         df2['tweet'] = df2['tweet'].str.replace('&lt;', '<', case=False)
         df2['tweet'] = df2['tweet'].str.replace('&gt;', '>', case=False)
-        df2.to_csv(f'C:/Users/mcgui/Desktop/Secondary/{x}.csv', encoding='utf-8-sig')
+        df2.to_csv(f'C:/Users/mcgui/Desktop/Secondary/TLOutput/{x}.csv', encoding='utf-8-sig')
 
 
 
