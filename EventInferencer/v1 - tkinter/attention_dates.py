@@ -15,7 +15,6 @@ days = d1 - d0
 days = days.days
 
 def attention(ticker,api_token):
-
     ticker = ticker.upper()
     try:
         URL = f'http://thebaite.com:81/api/v1/stocks/metric?m=attention&d={days}&s={ticker}&token={api_token}' 
@@ -55,6 +54,25 @@ def attention(ticker,api_token):
     markers = df_maxdates.sort_values(by=['MA7']).tail(5) #Select top 5 days for attention within range
     print(markers)
     return markers
+
+def sentiment(ticker, api_token):
+    ticker = ticker.upper()
+    try:
+        URL2 = f'http://thebaite.com:81/api/v1/stocks/metric?m=sentiment&d={days}&s={ticker}&token={api_token}' 
+        r2 = requests.get(URL2)
+        rJson2 =  r2.json() 
+    except Exception as e:
+        print(e)
+    a = json.dumps(rJson2)
+    b = json.loads(a)
+    df_sentiment = pd.DataFrame(b)
+    df_sentiment['t'] = pd.to_datetime(df_sentiment['t'],unit ='s').apply(lambda x: x.strftime('%m/%d/%Y'))
+    df_sentiment.rename(columns={'t': 'Date','d': 'Sentiment Score'}, inplace=True)
+    df_sentiment= df_sentiment.reindex(columns = ['Date', "Sentiment Score"])
+    df_sentiment = df_sentiment.iloc[::-1]
+    df_sentiment['Sentiment Score'] = 100*((df_sentiment['Sentiment Score'] - min(df_sentiment['Sentiment Score'])) / (max(df_sentiment['Sentiment Score']) - min(df_sentiment['Sentiment Score']))) #Rescale (0-100)
+    return df_sentiment
+    
 
 # def attention(ticker,api_token):
 # ticker = ticker.upper()

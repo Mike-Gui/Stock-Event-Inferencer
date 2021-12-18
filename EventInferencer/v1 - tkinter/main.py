@@ -129,8 +129,7 @@ def historicalData(ticker):
     interval = "1d"
     ticker = ticker.get()
     yahooQuery = f'https://query1.finance.yahoo.com/v7/finance/download/{ticker}?period1={period1}&period2={period2}&interval={interval}&events=history' #&includeAdjustedClose=true'
-    global df1
-    global df1Length
+    global df1, df1Length
     df1 = pd.read_csv(yahooQuery, parse_dates=["Date"], index_col ="Date")
     df1.drop('Open', axis=1, inplace=True)
     df1.drop('High', axis=1, inplace=True)
@@ -141,19 +140,17 @@ def historicalData(ticker):
     df1['Date'] = pd.to_datetime(df1["Date"].dt.strftime('%Y-%m-%d'))
     df1Length = len(df1) - 1
     
-#Retrieve data from API script------------------------------------------------------
+#Retrieve data from thebAIte apis------------------------------------------------------
     try:
-        global markers
-        global marker_index
-        global marker_dates
+        global markers, marker_index, marker_dates, df_sentiment
+
         markers = Attention.attention(ticker, attentionAPI)
+        df_sentiment = Attention.sentiment(ticker, attentionAPI)
         marker_index = markers['index'].tolist()
         marker_dates = markers['Date'].tolist()
         marker_dates.sort()
         #print(marker_dates)
-        global day1, day2, day3, day4, day5
-        global day1_dt, day2_dt, day3_dt, day4_dt, day5_dt
-
+        global day1, day2, day3, day4, day5, day1_dt, day2_dt, day3_dt, day4_dt, day5_dt
         day1 = marker_dates[0]
         day2 = marker_dates[1]
         day3 = marker_dates[2]
@@ -173,8 +170,7 @@ def historicalData(ticker):
         print(e)
     
 #Determine if the 1yr price action is positive or negative----------------------------
-    global priceChange1yr
-    global posneg #identifier for YoY status
+    global priceChange1yr, posneg #identifier for YoY status
     priceChange1yr = float(df1['Close'].values[df1Length])-float(df1['Close'].values[4]) ##determines if the change over the last year was positive or negative
     if priceChange1yr >= 0: #sets the posneg value to 1 if the price has increased or not moved in the last year
         posneg = 1
@@ -208,10 +204,9 @@ def day1_report():
         canvas.configure(yscrollcommand=scrollbar.set)
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
+        listbox.insert(END, 'Gathering Earnings Data...')
         earnings_dates(ticker)
         recent_er = list()
-
-        print(e_list)
         for i in e_list:
             if i < (day1_dt+datetime.timedelta(days=7)):
                 prevER1 = i
@@ -229,6 +224,8 @@ def day1_report():
         ttk.Label(scrollable_frame, text=article_list[7]).pack(fill=BOTH,expand = Y,pady=5)
         ttk.Label(scrollable_frame, text=article_list[8]).pack(fill=BOTH,expand = Y, pady=5)
         ttk.Label(scrollable_frame, text=article_list[9]).pack(fill=BOTH,expand = Y, pady=5)
+        listbox.insert(END, 'Gathering Twitter Data...')
+        #Call twitter def here
         listbox.insert(END, 'Done.')
 
 def day2_report():
@@ -258,10 +255,9 @@ def day2_report():
         canvas.configure(yscrollcommand=scrollbar.set)
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
+        listbox.insert(END, 'Gathering Earnings Data...')
         earnings_dates(ticker)
         recent_er = list()
-
-        print(e_list)
         for i in e_list:
             if i < (day2_dt+datetime.timedelta(days=7)):
                 prevER2 = i
@@ -279,6 +275,7 @@ def day2_report():
         ttk.Label(scrollable_frame, text=article_list[7]).pack(fill=BOTH,expand = Y,pady=5)
         ttk.Label(scrollable_frame, text=article_list[8]).pack(fill=BOTH,expand = Y, pady=5)
         ttk.Label(scrollable_frame, text=article_list[9]).pack(fill=BOTH,expand = Y, pady=5)
+        listbox.insert(END, 'Gathering Twitter Data...')
         listbox.insert(END, 'Done.')
 
 def day3_report():
@@ -308,10 +305,9 @@ def day3_report():
         canvas.configure(yscrollcommand=scrollbar.set)
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
+        listbox.insert(END, 'Gathering Earnings Data...')
         earnings_dates(ticker)
         recent_er = list()
-
-        print(e_list)
         for i in e_list:
             if i < (day3_dt+datetime.timedelta(days=7)):
                 prevER3 = i
@@ -329,6 +325,7 @@ def day3_report():
         ttk.Label(scrollable_frame, text=article_list[7]).pack(fill=BOTH,expand = Y,pady=5)
         ttk.Label(scrollable_frame, text=article_list[8]).pack(fill=BOTH,expand = Y, pady=5)
         ttk.Label(scrollable_frame, text=article_list[9]).pack(fill=BOTH,expand = Y, pady=5)
+        listbox.insert(END, 'Gathering Twitter Data...')
         listbox.insert(END, 'Done.')
 
 def day4_report():
@@ -359,10 +356,11 @@ def day4_report():
         canvas.configure(yscrollcommand=scrollbar.set)
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
+        listbox.insert(END, 'Gathering Earnings Data...')
         earnings_dates(ticker)
         recent_er = list()
 
-        print(e_list)
+
         for i in e_list:
             if i < (day4_dt+datetime.timedelta(days=7)):
                 prevER4 = i
@@ -380,6 +378,7 @@ def day4_report():
         ttk.Label(scrollable_frame, text=article_list[7]).pack(fill=BOTH,expand = Y,pady=5)
         ttk.Label(scrollable_frame, text=article_list[8]).pack(fill=BOTH,expand = Y, pady=5)
         ttk.Label(scrollable_frame, text=article_list[9]).pack(fill=BOTH,expand = Y, pady=5)
+        listbox.insert(END, 'Gathering Twitter Data...')
         listbox.insert(END, 'Done.')
 
 def day5_report():
@@ -409,9 +408,9 @@ def day5_report():
         canvas.configure(yscrollcommand=scrollbar.set)
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
+        listbox.insert(END, 'Gathering Earnings Data...')
         earnings_dates(ticker)
         recent_er = list()
-        print(e_list)
         for i in e_list:
             if i < (day5_dt+datetime.timedelta(days=7)):
                 prevER5 = i
@@ -429,6 +428,7 @@ def day5_report():
         ttk.Label(scrollable_frame, text=article_list[7]).pack(fill=BOTH,expand = Y,pady=5)
         ttk.Label(scrollable_frame, text=article_list[8]).pack(fill=BOTH,expand = Y, pady=5)
         ttk.Label(scrollable_frame, text=article_list[9]).pack(fill=BOTH,expand = Y, pady=5)
+        listbox.insert(END, 'Gathering Twitter Data...')
         listbox.insert(END, 'Done.')
 
 
@@ -507,16 +507,21 @@ def makeChart():
     else:
         fig.clear()
         graph1 = fig.add_subplot(111)
+        graph2 = graph1.twinx()
+
         if posneg == 1:
-           graph1.plot(df1.index, df1['Close'], color = "#08c959", linewidth=0.9, linestyle='-', marker = 'o',ms=7, markerfacecolor = "#000000", markevery=marker_index)
+           graph1.plot(df1.index, df1['Close'], color = "#3cc74c", linewidth=1.1, linestyle='-', marker = 'o',ms=7, markerfacecolor = "#000000", markevery=marker_index)
+           graph2.plot(df_sentiment.index, df_sentiment['Sentiment Score'], color = '#31c9f7', linewidth=0.5, linestyle = '-')
         else:
-           graph1.plot(df1.index, df1['Close'], color = "#ed000c", linewidth=0.9, linestyle='-', marker= 'o',ms=7, markerfacecolor = "#000000", markevery=marker_index )
+           graph1.plot(df1.index, df1['Close'], color = "#ed000c", linewidth=1.1, linestyle='-', marker= 'o',ms=7, markerfacecolor = "#000000", markevery=marker_index )
+           graph2.plot(df_sentiment.index, df_sentiment['Sentiment Score'], color = '#31c9f7', linewidth=0.5, linestyle = '-')
         graph1.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d'))
         a = list((range(1,(df1Length+30),30))) #Sets the tick length to one month
         graph1.xaxis.set_ticks(a)
         graph1.grid(True)
-        #graph1.set_xlabel("Date")
+        graph1.set_xlabel("Date")
         graph1.set_ylabel("Price per Share")
+        graph2.set_ylabel("Sentiment Score")
         canvas = FigureCanvasTkAgg(fig, master = frame)
         fig.canvas.draw_idle 
         canvas.get_tk_widget().pack()
