@@ -19,6 +19,7 @@ from random import randrange
 import attention_dates as Attention
 import notice as notice
 import APIKEYS as APIKEYS
+import twitter_scan as twitter_scan
 #Defaults--------------------------------------------------------------------------------
 clear = 0
 day1 = ""
@@ -143,10 +144,9 @@ def historicalData(ticker):
 #Retrieve data from thebAIte apis------------------------------------------------------
     try:
         global markers, marker_index, marker_dates, df_sentiment
-
         markers = Attention.attention(ticker, attentionAPI)
         df_sentiment = Attention.sentiment(ticker, attentionAPI)
-        marker_index = markers['index'].tolist()
+        marker_index = markers['Index'].tolist()
         marker_dates = markers['Date'].tolist()
         marker_dates.sort()
         #print(marker_dates)
@@ -205,6 +205,7 @@ def day1_report():
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
         listbox.insert(END, 'Gathering Earnings Data...')
+
         earnings_dates(ticker)
         recent_er = list()
         for i in e_list:
@@ -213,6 +214,7 @@ def day1_report():
                 recent_er.append(prevER1)
         prevER1 = recent_er[0]
         prevER1 = prevER1.strftime('%m/%d/%Y')
+
         ttk.Label(scrollable_frame, text="Most recent earnings date "+prevER1, font = 'bold').pack(fill=BOTH,expand = Y, pady=10)
         ttk.Label(scrollable_frame, text=article_list[0]).pack(fill=BOTH,expand = Y, pady=5)
         ttk.Label(scrollable_frame, text=article_list[1]).pack(fill=BOTH,expand = Y,pady=5)
@@ -224,8 +226,11 @@ def day1_report():
         ttk.Label(scrollable_frame, text=article_list[7]).pack(fill=BOTH,expand = Y,pady=5)
         ttk.Label(scrollable_frame, text=article_list[8]).pack(fill=BOTH,expand = Y, pady=5)
         ttk.Label(scrollable_frame, text=article_list[9]).pack(fill=BOTH,expand = Y, pady=5)
-        listbox.insert(END, 'Gathering Twitter Data...')
-        #Call twitter def here
+        #twitter related scanning
+        if tweetVar.get() == True:
+            listbox.insert(END, 'Gathering Twitter Data...')
+            twitter_scan.mainLook(ticker, day1)
+        #find output method
         listbox.insert(END, 'Done.')
 
 def day2_report():
@@ -441,8 +446,15 @@ bbar = Frame(frame, relief = 'sunken', width=600, bd = 4)
 bbar.pack(expand = 1, fill = BOTH, side = BOTTOM, pady = 5)
 #Reports--------------------------------------------------
 reports = Frame(frame, bd= 2, relief= 'groove')
-reportlbl = Label(reports, text = "Reports:", font =('bold'))
+reportlbl = Label(reports, text = "Important Day Reports:", font =('bold'))
 reportlbl.pack(side=LEFT)
+articleVar = BooleanVar()
+tweetVar = BooleanVar()
+
+cb_article = Checkbutton(reports, text = "Articles", variable = articleVar, onvalue = True, offvalue = False ) ##add command def
+cb_tweets = Checkbutton(reports, text = "Tweets",variable = tweetVar, onvalue = True, offvalue = False) ##add command def
+cb_article.pack(side = LEFT)
+cb_tweets.pack(side = LEFT)
 d5b = Button(reports, text = day5, command = day5_report)
 d4b = Button(reports, text = day4, command = day4_report)
 d3b = Button(reports, text = day3, command = day3_report)
@@ -510,7 +522,7 @@ def makeChart():
         graph2 = graph1.twinx()
 
         if posneg == 1:
-           graph1.plot(df1.index, df1['Close'], color = "#3cc74c", linewidth=1.1, linestyle='-', marker = 'o',ms=7, markerfacecolor = "#000000", markevery=marker_index)
+           graph1.plot(df1.index, df1['Close'], color = "#089e00", linewidth=1.1, linestyle='-', marker = 'o',ms=7, markerfacecolor = "#000000", markevery=marker_index)
            graph2.plot(df_sentiment.index, df_sentiment['Sentiment Score'], color = '#31c9f7', linewidth=0.5, linestyle = '-')
         else:
            graph1.plot(df1.index, df1['Close'], color = "#ed000c", linewidth=1.1, linestyle='-', marker= 'o',ms=7, markerfacecolor = "#000000", markevery=marker_index )
@@ -520,7 +532,7 @@ def makeChart():
         graph1.xaxis.set_ticks(a)
         graph1.grid(True)
         graph1.set_xlabel("Date")
-        graph1.set_ylabel("Price per Share")
+        graph1.set_ylabel("Share Price (USD)")
         graph2.set_ylabel("Sentiment Score")
         canvas = FigureCanvasTkAgg(fig, master = frame)
         fig.canvas.draw_idle 
