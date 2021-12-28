@@ -7,7 +7,7 @@ For now, the project works using a simple Tkinter GUI. Later versions will use b
 
 
 # To run:
-1. set up a bAIte.com account to receive free API token and sign up for an API token
+1. set up a thebAIte.com account to receive free API token and sign up for an API token
 2. set up a  USearch account (https://usearch.com/web-search-api) and sign up for an API token (free for 100 calls/min)
 3. paste your API token in the "APIKEYS.py" file under the EventInferencer folder
 4. run "main.py" 
