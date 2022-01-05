@@ -14,6 +14,7 @@ import datetime as datetime
 import time
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import matplotlib.lines as mlines
 import matplotlib.dates as mdates
 from random import randrange
 import attention_dates as Attention
@@ -205,15 +206,18 @@ def day1_report():
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
         listbox.insert(END, 'Gathering Earnings Data...')
-
-        earnings_dates(ticker)
-        recent_er = list()
-        for i in e_list:
-            if i < (day1_dt+datetime.timedelta(days=7)):
-                prevER1 = i
-                recent_er.append(prevER1)
-        prevER1 = recent_er[0]
-        prevER1 = prevER1.strftime('%m/%d/%Y')
+        try:
+            earnings_dates(ticker)
+            recent_er = list()
+            for i in e_list:
+                if i < (day1_dt+datetime.timedelta(days=7)):
+                    prevER1 = i
+                    recent_er.append(prevER1)
+            prevER1 = recent_er[0]
+            
+            prevER1 = prevER1.strftime('%m/%d/%Y')
+        except Exception as e:
+            prevER1 = "unknown"
 
         ttk.Label(scrollable_frame, text="Most recent earnings date "+prevER1, font = 'bold').pack(fill=BOTH,expand = Y, pady=10)
         ttk.Label(scrollable_frame, text=article_list[0]).pack(fill=BOTH,expand = Y, pady=5)
@@ -227,7 +231,7 @@ def day1_report():
         ttk.Label(scrollable_frame, text=article_list[8]).pack(fill=BOTH,expand = Y, pady=5)
         ttk.Label(scrollable_frame, text=article_list[9]).pack(fill=BOTH,expand = Y, pady=5)
         #twitter related scanning
-        if tweetVar.get() == True:
+        if tweetVar == True:
             listbox.insert(END, 'Gathering Twitter Data...')
             twitter_scan.mainLook(ticker, day1)
         #find output method
@@ -448,6 +452,7 @@ bbar.pack(expand = 1, fill = BOTH, side = BOTTOM, pady = 5)
 reports = Frame(frame, bd= 2, relief= 'groove')
 reportlbl = Label(reports, text = "Important Day Reports:", font =('bold'))
 reportlbl.pack(side=LEFT)
+global tweetVar, articleVar
 articleVar = BooleanVar()
 tweetVar = BooleanVar()
 
@@ -534,6 +539,9 @@ def makeChart():
         graph1.set_xlabel("Date")
         graph1.set_ylabel("Share Price (USD)")
         graph2.set_ylabel("Sentiment Score")
+        importantDaysmarker = mlines.Line2D([], [], color="#000000", marker='o', linestyle='None',
+                                markersize=7, label='Important Days')
+        graph1.legend(handles=[importantDaysmarker])
         canvas = FigureCanvasTkAgg(fig, master = frame)
         fig.canvas.draw_idle 
         canvas.get_tk_widget().pack()

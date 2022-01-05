@@ -2,8 +2,8 @@ import twint
 import pandas as pd
 import time as time
 import datetime as datetime
-from bs4 import BeautifulSoup
-import requests
+#from bs4 import BeautifulSoup
+#import requests
 
 #pip3 install --upgrade -e git+https://github.com/twintproject/twint.git@origin/master#egg=twint
 
