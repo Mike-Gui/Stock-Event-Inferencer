@@ -1,3 +1,7 @@
+This program no longer functions
+The API it was dependent on is no longer in service. 
+
+
 # Stock-Event-Inferencer
 This program gives short inferences on the reasons for large moves in any S&P500 stock using short NLP analysis of headlines on relevant days.
 
