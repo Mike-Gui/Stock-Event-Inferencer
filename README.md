@@ -1,4 +1,4 @@
-This program no longer functions
+This program no longer functions.
 The API it was dependent on is no longer in service. 
 
 
