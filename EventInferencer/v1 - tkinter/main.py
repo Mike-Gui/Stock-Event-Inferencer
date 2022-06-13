@@ -90,7 +90,7 @@ def tickerGetFirst(ticker):
 def earnings_dates(ticker):
     
     currentday = datetime.datetime.today()
-    firstdate = datetime.datetime(2020, 1, 1)
+    firstdate = datetime.datetime(2021, 1, 1)
     try:
         headers= {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'}
         #ticker = ticker.get() ### retrieves the ticker from the main.py user entry request
